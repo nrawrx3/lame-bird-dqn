@@ -1,0 +1,3 @@
+# bird game
+
+`flutter run`
