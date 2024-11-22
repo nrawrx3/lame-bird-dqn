@@ -24,6 +24,7 @@ enum GameMode {
   playing,
   wallBuilding,
   wallVisualizing,
+  rl_training,
 }
 
 class MyGame extends FlameGame
@@ -35,6 +36,8 @@ class MyGame extends FlameGame
   final Ball ball;
 
   final PositionComponent ballX = PositionComponent();
+
+  var resetCount = 0;
 
   var badCollisionCount = 0;
   var points = 0;
@@ -89,19 +92,7 @@ class MyGame extends FlameGame
 
     camera.backdrop = parallaxComponent;
 
-    ball.position = size / 2;
-
-    ballX.position = ball.position.clone();
-
-    backgroundRect = RectangleComponent(
-        size: Vector2(viewWidth * 2, viewHeight * 2),
-        paint: Paint()..color = const Color.fromARGB(100, 253, 242, 242),
-        anchor: Anchor.center);
-
-    backgroundRect.position = ball.position.clone();
-    backgroundRect.position.x += 100;
-
-    world.add(backgroundRect);
+    _resetGame();
 
     if (gameMode == GameMode.wallBuilding) {
       final wallBuilder = WallBuilder();
@@ -111,10 +102,9 @@ class MyGame extends FlameGame
       ball.setColor(const Color.fromARGB(255, 233, 70, 0));
     }
 
-    world.add(ball);
-    world.add(ballX);
-
-    camera.follow(ballX);
+    // world.add(ball);
+    // world.add(ballX);
+    // camera.follow(ballX);
 
     if (gameMode == GameMode.playing) {
       // world.add(WallRefresherComponent(maxWallsInView: maxWallsInView));
@@ -130,17 +120,6 @@ class MyGame extends FlameGame
 
       world.add(wallQueue);
     }
-
-    // if (gameMode == GameMode.wallVisualizing) {
-    //   var walls =
-    //       PerlinWallGenerator(rng, seed: 0xdeadbeef).generateWalls(0, 10000);
-
-    //   for (var wall in walls) {
-    //     world.add(wall);
-    //   }
-    // }
-
-    // camera.viewfinder.angle = 20 * pi / 180;
 
     // debugMode = true;
 
@@ -202,6 +181,40 @@ class MyGame extends FlameGame
   void handleInGameTap() {
     tapCount++;
     ball.addVelocity(Vector2(0, -diffParams.ballNudgeVelocity));
+  }
+
+  void _resetBallPosition() {
+    if (resetCount > 0) {
+      world.remove(ball);
+      world.remove(ballX);
+    }
+
+    ball.position = size / 2;
+    ballX.position = ball.position.clone();
+  }
+
+  void _resetGame() {
+    _resetBallPosition();
+
+    if (resetCount > 0) {
+      world.remove(backgroundRect);
+    }
+
+    backgroundRect = RectangleComponent(
+        size: Vector2(viewWidth * 2, viewHeight * 2),
+        paint: Paint()..color = const Color.fromARGB(100, 253, 242, 242),
+        anchor: Anchor.center);
+
+    backgroundRect.position = ball.position.clone();
+    backgroundRect.position.x += 100;
+
+    world.add(backgroundRect);
+
+    world.add(ball);
+    world.add(ballX);
+    camera.follow(ballX);
+
+    resetCount++;
   }
 
   @override

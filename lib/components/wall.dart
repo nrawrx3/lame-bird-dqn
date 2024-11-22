@@ -108,7 +108,7 @@ class WallComponent extends RectangleComponent
   }
 
   void handlePointGivingCollision() {
-    FlameAudio.play("good_collision.wav");
+    // FlameAudio.play("good_collision.wav");
 
     game.addPoints(points);
     game.shouldRotateCamera = false;
@@ -120,7 +120,7 @@ class WallComponent extends RectangleComponent
   void handleBadCollision() {
     debugPrint("Bad collision detected");
 
-    FlameAudio.play("bad_collision.wav");
+    // FlameAudio.play("bad_collision.wav");
 
     game.badCollisionCount++;
     game.addPoints(-game.diffParams.badWallPenalty);

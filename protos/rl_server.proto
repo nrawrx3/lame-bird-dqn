@@ -1,0 +1,81 @@
+syntax = "proto3";
+
+service RLServer {
+  rpc CreateNewGame(CreateNewGameRequest) returns (CreateNewGameResponse) {}
+
+  rpc StepGame(StepGameRequest) returns (StepGameResponse) {}
+}
+
+message CreateNewGameRequest {
+  int64 seed = 1;
+  int64 max_walls = 2;
+}
+
+message CreateNewGameResponse {
+  GameWorldBounds game_world_bounds = 1;
+  DifficultyParams difficulty_params = 2;
+  GameState game_state = 3;
+}
+
+message GameWorldBounds {
+  double view_width = 1;
+  double view_height = 2;
+  double min_wall_gap = 3;
+}
+
+// The model training does not care about these parameters except the pentalty.
+// We're sending these to the Python client just to create logs.
+message DifficultyParams {
+  double ball_max_velocity = 1;
+  double ball_starting_velocity = 2;
+  bool disable_camera_tilt = 3;
+  double ball_nudge_velocity = 4;
+  double noise_scale = 5;
+  double g = 6;
+  double bad_wall_invisible_probability = 7;
+  double max_wall_height = 8;
+  double min_wall_height = 9;
+  int32 bad_wall_penalty = 10;
+  double max_wall_width = 11;
+  double min_wall_width = 12;
+  double ball_radius = 13;
+}
+
+message GameState {
+  BallState ball_state = 1;
+  VisibleWallsState visible_walls_state = 2;
+  Wall collided_wall = 3;
+  double time = 4;
+}
+
+message BallState {
+  double x = 1;
+  double y = 2;
+  double v = 3;
+  double a = 4;
+}
+
+message VisibleWallsState {
+  repeated Wall walls = 1;
+}
+
+message Wall {
+  double x = 1;
+  double y = 2;
+  double width = 3;
+  double height = 4;
+  double points = 5; // Reward
+}
+
+
+message StepGameRequest {
+  bool should_jump = 1;
+}
+
+message StepGameResponse {
+  GameState game_state = 1;
+  bool game_over = 2;
+  double reward = 3;
+  double penalty = 4;
+  double score = 5;
+}

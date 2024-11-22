@@ -7,7 +7,7 @@ import 'dart:math';
 const viewWidth = 534.0;
 const viewHeight = 300.0;
 
-const maxWallGap = 10.0;
+// const maxWallGap = 10.0;
 const minWallGap = 0.2;
 
 const maxWallsInView = 40;

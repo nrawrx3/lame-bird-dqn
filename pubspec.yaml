@@ -38,6 +38,7 @@ dependencies:
   flame: ^1.17.0
   flame_audio: ^2.10.3
   fast_noise: ^2.0.0
+  grpc: ^4.0.1
 
 dev_dependencies:
   flutter_test:
