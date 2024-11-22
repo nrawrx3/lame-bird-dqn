@@ -11,6 +11,7 @@ import 'package:flutter/widgets.dart';
 import 'package:lame_hexagon/components/ball.dart';
 import 'package:lame_hexagon/components/collision_count.dart';
 import 'package:lame_hexagon/config.dart';
+import 'package:lame_hexagon/rl_server.dart';
 import 'package:lame_hexagon/wall_builder.dart';
 import 'package:lame_hexagon/wall_height_generator.dart';
 import 'package:lame_hexagon/wall_queue.dart';
@@ -24,11 +25,18 @@ enum GameMode {
   playing,
   wallBuilding,
   wallVisualizing,
-  rl_training,
+  rlTraining,
+}
+
+// From the point of view of the RL the game can be in one of the following states:
+enum RLServerControlState {
+  idle,
+  awaitingStepCommand,
+  executingStepCommand,
 }
 
 class MyGame extends FlameGame
-    with HasCollisionDetection, KeyboardEvents, TapCallbacks {
+    with HasCollisionDetection, KeyboardEvents, TapCallbacks, HasTimeScale {
   final cameraBounds = Vector2(viewWidth, viewHeight);
 
   final DifficultyParams diffParams;
@@ -53,6 +61,8 @@ class MyGame extends FlameGame
   var accumulatedTime = 0.0;
   var shouldRotateCamera = false;
 
+  RLServerControlState rlControlState = RLServerControlState.idle;
+
   final Random rng;
   int difficultyLevel = 0;
 
@@ -76,6 +86,8 @@ class MyGame extends FlameGame
   @override
   FutureOr<void> onLoad() async {
     super.onLoad();
+
+    timeScale = 0.2;
 
     // camera.viewport =
     //     FixedResolutionViewport(resolution: Vector2(viewWidth, viewHeight));
@@ -193,7 +205,7 @@ class MyGame extends FlameGame
     ballX.position = ball.position.clone();
   }
 
-  void _resetGame() {
+  void resetGame() {
     _resetBallPosition();
 
     if (resetCount > 0) {
@@ -215,6 +227,12 @@ class MyGame extends FlameGame
     camera.follow(ballX);
 
     resetCount++;
+
+    rlControlState = RLServerControlState.idle;
+  }
+
+  void updateWithRLServerCommand() {
+    if (rlControlState == RLServerControlState.awaitingStepCommand) {}
   }
 
   @override
