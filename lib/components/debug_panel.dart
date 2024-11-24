@@ -2,8 +2,7 @@ import 'package:flame/components.dart';
 import 'package:flutter/material.dart';
 import 'package:lame_hexagon/my_game.dart';
 
-class CollisionCountPanel extends PositionComponent
-    with HasGameReference<MyGame> {
+class DebugCountPanel extends PositionComponent with HasGameReference<MyGame> {
   late TextComponent _textComponent;
 
   @override
@@ -37,6 +36,11 @@ class CollisionCountPanel extends PositionComponent
 
     if (game.isPaused) {
       _textComponent.text = 'Paused';
+      return;
+    }
+
+    if (game.isAwaitingStepCommand) {
+      _textComponent.text = 'Awaiting step command';
       return;
     }
 

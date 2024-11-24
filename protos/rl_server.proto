@@ -44,15 +44,22 @@ message DifficultyParams {
 message GameState {
   BallState ball_state = 1;
   VisibleWallsState visible_walls_state = 2;
-  Wall collided_wall = 3;
+  repeated WallCollision wall_collisions = 3;
   double time = 4;
+}
+
+message WallCollision {
+  Wall wall = 1;
+  BallState ball_state = 2; // Ball state at the time of collision
 }
 
 message BallState {
   double x = 1;
   double y = 2;
-  double v = 3;
-  double a = 4;
+  double vx = 3;
+  double vy = 4;
+  double ax = 5;
+  double ay = 6;
 }
 
 message VisibleWallsState {

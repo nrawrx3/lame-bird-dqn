@@ -61,6 +61,10 @@ class Ball extends RectangleComponent
     // debugPrint('Ball position: $position');
     super.update(dt);
 
+    if (game.isAwaitingStepCommand) {
+      return;
+    }
+
     if (game.tapCount == 0 || game.isPaused) {
       return;
     }
@@ -71,6 +75,10 @@ class Ball extends RectangleComponent
   @override
   void fixedUpdate(double dt) {
     if (game.tapCount == 0) {
+      return;
+    }
+
+    if (game.isAwaitingStepCommand) {
       return;
     }
 
@@ -88,7 +96,7 @@ class Ball extends RectangleComponent
     }
   }
 
-// Add an impulse velocity to the ball
+  // Add an impulse velocity to the ball
   void addVelocity(Vector2 impulse) {
     // vPrev += impulse;
     v.y = impulse.y;

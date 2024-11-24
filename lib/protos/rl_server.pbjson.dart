@@ -100,7 +100,7 @@ const GameState$json = {
   '2': [
     {'1': 'ball_state', '3': 1, '4': 1, '5': 11, '6': '.BallState', '10': 'ballState'},
     {'1': 'visible_walls_state', '3': 2, '4': 1, '5': 11, '6': '.VisibleWallsState', '10': 'visibleWallsState'},
-    {'1': 'collided_wall', '3': 3, '4': 1, '5': 11, '6': '.Wall', '10': 'collidedWall'},
+    {'1': 'wall_collisions', '3': 3, '4': 3, '5': 11, '6': '.WallCollision', '10': 'wallCollisions'},
     {'1': 'time', '3': 4, '4': 1, '5': 1, '10': 'time'},
   ],
 };
@@ -109,8 +109,22 @@ const GameState$json = {
 final $typed_data.Uint8List gameStateDescriptor = $convert.base64Decode(
     'CglHYW1lU3RhdGUSKQoKYmFsbF9zdGF0ZRgBIAEoCzIKLkJhbGxTdGF0ZVIJYmFsbFN0YXRlEk'
     'IKE3Zpc2libGVfd2FsbHNfc3RhdGUYAiABKAsyEi5WaXNpYmxlV2FsbHNTdGF0ZVIRdmlzaWJs'
-    'ZVdhbGxzU3RhdGUSKgoNY29sbGlkZWRfd2FsbBgDIAEoCzIFLldhbGxSDGNvbGxpZGVkV2FsbB'
-    'ISCgR0aW1lGAQgASgBUgR0aW1l');
+    'ZVdhbGxzU3RhdGUSNwoPd2FsbF9jb2xsaXNpb25zGAMgAygLMg4uV2FsbENvbGxpc2lvblIOd2'
+    'FsbENvbGxpc2lvbnMSEgoEdGltZRgEIAEoAVIEdGltZQ==');
+
+@$core.Deprecated('Use wallCollisionDescriptor instead')
+const WallCollision$json = {
+  '1': 'WallCollision',
+  '2': [
+    {'1': 'wall', '3': 1, '4': 1, '5': 11, '6': '.Wall', '10': 'wall'},
+    {'1': 'ball_state', '3': 2, '4': 1, '5': 11, '6': '.BallState', '10': 'ballState'},
+  ],
+};
+
+/// Descriptor for `WallCollision`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List wallCollisionDescriptor = $convert.base64Decode(
+    'Cg1XYWxsQ29sbGlzaW9uEhkKBHdhbGwYASABKAsyBS5XYWxsUgR3YWxsEikKCmJhbGxfc3RhdG'
+    'UYAiABKAsyCi5CYWxsU3RhdGVSCWJhbGxTdGF0ZQ==');
 
 @$core.Deprecated('Use ballStateDescriptor instead')
 const BallState$json = {
@@ -118,15 +132,17 @@ const BallState$json = {
   '2': [
     {'1': 'x', '3': 1, '4': 1, '5': 1, '10': 'x'},
     {'1': 'y', '3': 2, '4': 1, '5': 1, '10': 'y'},
-    {'1': 'v', '3': 3, '4': 1, '5': 1, '10': 'v'},
-    {'1': 'a', '3': 4, '4': 1, '5': 1, '10': 'a'},
+    {'1': 'vx', '3': 3, '4': 1, '5': 1, '10': 'vx'},
+    {'1': 'vy', '3': 4, '4': 1, '5': 1, '10': 'vy'},
+    {'1': 'ax', '3': 5, '4': 1, '5': 1, '10': 'ax'},
+    {'1': 'ay', '3': 6, '4': 1, '5': 1, '10': 'ay'},
   ],
 };
 
 /// Descriptor for `BallState`. Decode as a `google.protobuf.DescriptorProto`.
 final $typed_data.Uint8List ballStateDescriptor = $convert.base64Decode(
-    'CglCYWxsU3RhdGUSDAoBeBgBIAEoAVIBeBIMCgF5GAIgASgBUgF5EgwKAXYYAyABKAFSAXYSDA'
-    'oBYRgEIAEoAVIBYQ==');
+    'CglCYWxsU3RhdGUSDAoBeBgBIAEoAVIBeBIMCgF5GAIgASgBUgF5Eg4KAnZ4GAMgASgBUgJ2eB'
+    'IOCgJ2eRgEIAEoAVICdnkSDgoCYXgYBSABKAFSAmF4Eg4KAmF5GAYgASgBUgJheQ==');
 
 @$core.Deprecated('Use visibleWallsStateDescriptor instead')
 const VisibleWallsState$json = {
@@ -205,6 +221,7 @@ const $core.Map<$core.String, $core.Map<$core.String, $core.dynamic>> RLServerSe
   '.BallState': BallState$json,
   '.VisibleWallsState': VisibleWallsState$json,
   '.Wall': Wall$json,
+  '.WallCollision': WallCollision$json,
   '.StepGameRequest': StepGameRequest$json,
   '.StepGameResponse': StepGameResponse$json,
 };

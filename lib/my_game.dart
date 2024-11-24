@@ -4,14 +4,14 @@ import 'package:flame/components.dart';
 import 'package:flame/events.dart';
 import 'package:flame/extensions.dart';
 import 'package:flame/game.dart';
-import 'package:flame/parallax.dart';
 import 'package:flame_audio/flame_audio.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:lame_hexagon/components/ball.dart';
-import 'package:lame_hexagon/components/collision_count.dart';
-import 'package:lame_hexagon/config.dart';
-import 'package:lame_hexagon/rl_server.dart';
+import 'package:lame_hexagon/components/debug_panel.dart';
+import 'package:lame_hexagon/components/wall.dart';
+import 'package:lame_hexagon/config.dart' as config;
+import 'package:lame_hexagon/protos/rl_server.pbgrpc.dart';
 import 'package:lame_hexagon/wall_builder.dart';
 import 'package:lame_hexagon/wall_height_generator.dart';
 import 'package:lame_hexagon/wall_queue.dart';
@@ -30,16 +30,17 @@ enum GameMode {
 
 // From the point of view of the RL the game can be in one of the following states:
 enum RLServerControlState {
-  idle,
   awaitingStepCommand,
   executingStepCommand,
 }
 
+const numSkipFramesPerStepCommand = 10;
+
 class MyGame extends FlameGame
     with HasCollisionDetection, KeyboardEvents, TapCallbacks, HasTimeScale {
-  final cameraBounds = Vector2(viewWidth, viewHeight);
+  final cameraBounds = Vector2(config.viewWidth, config.viewHeight);
 
-  final DifficultyParams diffParams;
+  final config.DifficultyParams diffParams;
 
   final Ball ball;
 
@@ -61,14 +62,29 @@ class MyGame extends FlameGame
   var accumulatedTime = 0.0;
   var shouldRotateCamera = false;
 
-  RLServerControlState rlControlState = RLServerControlState.idle;
+  RLServerControlState _rlControlState =
+      RLServerControlState.awaitingStepCommand;
 
   final Random rng;
   int difficultyLevel = 0;
 
   GameMode gameMode;
 
-  bool isPaused = false;
+  bool isPaused =
+      false; // TODO: We should ignore this and depend on only the rlControlState.
+
+  // ----> Tracked data for a single RL step
+
+  // A step game request is taken and applied to the game and then we update for
+  // skip frames without any input from the RL server. Then we complete the
+  // completer with the current game state.
+  Completer<StepGameResponse>? _pendingStepGameResponse;
+  StepGameRequest? _stepGameRequest;
+  int _remainingSkipFramesForNextStepCommand = numSkipFramesPerStepCommand;
+  // The collisions the ball has had with the walls after a step command. We will send it to the RL server as part of StepGameResponse.
+  final List<WallCollision> _wallCollisions = [];
+
+  // <---- Tracked data for a single RL step
 
   late RectangleComponent backgroundRect;
   MyGame(int seed, this.difficultyLevel, this.diffParams,
@@ -81,30 +97,20 @@ class MyGame extends FlameGame
         rng = Random(seed),
         super(
             camera: CameraComponent.withFixedResolution(
-                width: viewWidth, height: viewHeight));
+                width: config.viewWidth, height: config.viewHeight));
 
   @override
   FutureOr<void> onLoad() async {
     super.onLoad();
 
-    timeScale = 0.2;
+    // timeScale = 0.2;
 
     // camera.viewport =
     //     FixedResolutionViewport(resolution: Vector2(viewWidth, viewHeight));
 
     camera.viewfinder.anchor = Anchor.center;
 
-    final parallaxComponent = await loadParallaxComponent([
-      ParallaxImageData('bg.png'),
-      ParallaxImageData('bg_white.png'),
-    ],
-        baseVelocity: Vector2(ball.v.x, 0),
-        velocityMultiplierDelta: Vector2(0.2, 0));
-    parallaxComponent.add(parallaxComponent);
-
-    camera.backdrop = parallaxComponent;
-
-    _resetGame();
+    resetGame();
 
     if (gameMode == GameMode.wallBuilding) {
       final wallBuilder = WallBuilder();
@@ -135,10 +141,58 @@ class MyGame extends FlameGame
 
     // debugMode = true;
 
-    camera.viewport.add(CollisionCountPanel());
+    camera.viewport.add(DebugCountPanel());
 
     FlameAudio.audioCache.loadAll(["good_collision.wav", "bad_collision.wav"]);
   }
+
+  Future<StepGameResponse> processStepCommand(StepGameRequest stepRequest) {
+    debugPrint('Received step command from RL server.');
+
+    // Do nothing if we're not in awaitingStepCommand state
+    if (_rlControlState != RLServerControlState.awaitingStepCommand) {
+      debugPrint(
+          'processStepCommand called when not in awaitingStepCommand state, fix the client please.');
+
+      return Future.value(StepGameResponse());
+    }
+
+    _pendingStepGameResponse = Completer<StepGameResponse>();
+    _remainingSkipFramesForNextStepCommand = numSkipFramesPerStepCommand;
+    _rlControlState = RLServerControlState.executingStepCommand;
+
+    return _pendingStepGameResponse!.future;
+  }
+
+  void recordWallCollisionEvent(WallComponent wall) {
+    _wallCollisions.add(WallCollision(
+      wall: Wall(
+        x: wall.position.x,
+        y: wall.position.y,
+        width: wall.width,
+        height: wall.height,
+        points: wall.points.toDouble(),
+      ),
+      ballState: BallState(
+        x: ball.position.x,
+        y: ball.position.y,
+        vx: ball.v.x,
+        vy: ball.v.y,
+        ax: ball.a.x,
+        ay: ball.a.y,
+      ),
+    ));
+  }
+
+  void _resetRLStateAfterSkipFrames() {
+    _remainingSkipFramesForNextStepCommand = numSkipFramesPerStepCommand;
+    _wallCollisions.clear();
+    _pendingStepGameResponse = null;
+    _rlControlState = RLServerControlState.awaitingStepCommand;
+  }
+
+  get isAwaitingStepCommand =>
+      _rlControlState == RLServerControlState.awaitingStepCommand;
 
   // For debugging.
   void panCamera(Direction direction) {
@@ -213,7 +267,7 @@ class MyGame extends FlameGame
     }
 
     backgroundRect = RectangleComponent(
-        size: Vector2(viewWidth * 2, viewHeight * 2),
+        size: Vector2(config.viewWidth * 2, config.viewHeight * 2),
         paint: Paint()..color = const Color.fromARGB(100, 253, 242, 242),
         anchor: Anchor.center);
 
@@ -228,62 +282,67 @@ class MyGame extends FlameGame
 
     resetCount++;
 
-    rlControlState = RLServerControlState.idle;
-  }
-
-  void updateWithRLServerCommand() {
-    if (rlControlState == RLServerControlState.awaitingStepCommand) {}
+    _rlControlState = RLServerControlState.awaitingStepCommand;
   }
 
   @override
   void update(double dt) {
     super.update(dt);
 
-    resetLastCollisionToGood?.update(dt);
+    switch (_rlControlState) {
+      case RLServerControlState.awaitingStepCommand:
+        break;
 
-    ballX.x = ball.position.x + viewWidth / 2 * 0.7;
-    if (gameMode == GameMode.wallBuilding) {
-      ballX.y = ball.position
-          .y; // Follow the ball vertically as well in wall building mode.
+      case RLServerControlState.executingStepCommand:
+        if (_remainingSkipFramesForNextStepCommand ==
+            numSkipFramesPerStepCommand) {
+          // We just received a new step command, apply it to the game.
+          _applyStepCommand(_stepGameRequest!);
+          _stepGameRequest = null;
+        }
+
+        _remainingSkipFramesForNextStepCommand =
+            max(0, _remainingSkipFramesForNextStepCommand - 1);
+
+        if (_remainingSkipFramesForNextStepCommand == 0) {
+          // TODO: Complete the completer with the step game response
+
+          debugPrint('Processed all frames before awaiting next step command.');
+
+          // Reset the RL state
+          _resetRLStateAfterSkipFrames();
+        }
+
+        resetLastCollisionToGood?.update(dt);
+
+        ballX.x = ball.position.x + config.viewWidth / 2 * 0.7;
+        if (gameMode == GameMode.wallBuilding) {
+          ballX.y = ball.position
+              .y; // Follow the ball vertically as well in wall building mode.
+        }
+
+        if (tapCount == 0 || isPaused) {
+          return;
+        }
+
+        accumulatedTime += dt;
+
+        // The more the collision, the more the ball velocity upto a max.
+        ball.v.x = min(
+            diffParams.ballStartingVelocity +
+                badCollisionCount * (config.viewWidth / 10),
+            diffParams.ballMaxVelocity);
+
+        updateBackgroundRectPosition();
     }
+  }
 
-    if (tapCount == 0 || isPaused) {
-      return;
+  void _applyStepCommand(StepGameRequest stepRequest) {
+    // Apply the step command to the game
+    if (stepRequest.shouldJump) {
+      tapCount++;
+      ball.addVelocity(Vector2(0, -diffParams.ballNudgeVelocity));
     }
-
-    accumulatedTime += dt;
-
-    // Rotate the camera continuously.
-    // camera.viewfinder.angle = 20 * pi / 180 * sin(DateTime.now().second / 10);
-
-    // The more the collision, the more probability of rotating the camera to a random angle.
-    if (!diffParams.disableCameraTilt &&
-        difficultyLevel >= 2 &&
-        shouldRotateCamera &&
-        rng.nextDouble() < badCollisionCount.toDouble() / 100) {
-      currentCameraAngle += -0.05 + rng.nextDouble() * 0.1;
-
-      if (currentCameraAngle > maxCameraTilt) {
-        currentCameraAngle = maxCameraTilt;
-      }
-      if (currentCameraAngle < -maxCameraTilt) {
-        currentCameraAngle = -maxCameraTilt;
-      }
-      camera.viewfinder.angle = currentCameraAngle;
-
-      // if (camera.viewfinder.angle == 0) {
-      //   camera.viewfinder.zoom = 1;
-      // } else {
-      //   camera.viewfinder.zoom = camera.viewfinder.angle.abs() * 0.05;
-      // }
-    }
-
-    // The more the collision, the more the ball velocity upto a max.
-    ball.v.x = min(
-        diffParams.ballStartingVelocity + badCollisionCount * (viewWidth / 10),
-        diffParams.ballMaxVelocity);
-
-    updateBackgroundRectPosition();
   }
 
   void updateBackgroundRectPosition() {
@@ -302,7 +361,8 @@ class MyGame extends FlameGame
   }
 
   get ballIsPassThrough =>
-      !disableBallPassThrough && (resetLastCollisionToGood?.finished ?? false);
+      !config.disableBallPassThrough &&
+      (resetLastCollisionToGood?.finished ?? false);
 }
 
 enum Direction { left, right, up, down }

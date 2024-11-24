@@ -465,7 +465,7 @@ class GameState extends $pb.GeneratedMessage {
   factory GameState({
     BallState? ballState,
     VisibleWallsState? visibleWallsState,
-    Wall? collidedWall,
+    $core.Iterable<WallCollision>? wallCollisions,
     $core.double? time,
   }) {
     final $result = create();
@@ -475,8 +475,8 @@ class GameState extends $pb.GeneratedMessage {
     if (visibleWallsState != null) {
       $result.visibleWallsState = visibleWallsState;
     }
-    if (collidedWall != null) {
-      $result.collidedWall = collidedWall;
+    if (wallCollisions != null) {
+      $result.wallCollisions.addAll(wallCollisions);
     }
     if (time != null) {
       $result.time = time;
@@ -490,7 +490,7 @@ class GameState extends $pb.GeneratedMessage {
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'GameState', createEmptyInstance: create)
     ..aOM<BallState>(1, _omitFieldNames ? '' : 'ballState', subBuilder: BallState.create)
     ..aOM<VisibleWallsState>(2, _omitFieldNames ? '' : 'visibleWallsState', subBuilder: VisibleWallsState.create)
-    ..aOM<Wall>(3, _omitFieldNames ? '' : 'collidedWall', subBuilder: Wall.create)
+    ..pc<WallCollision>(3, _omitFieldNames ? '' : 'wallCollisions', $pb.PbFieldType.PM, subBuilder: WallCollision.create)
     ..a<$core.double>(4, _omitFieldNames ? '' : 'time', $pb.PbFieldType.OD)
     ..hasRequiredFields = false
   ;
@@ -539,15 +539,7 @@ class GameState extends $pb.GeneratedMessage {
   VisibleWallsState ensureVisibleWallsState() => $_ensure(1);
 
   @$pb.TagNumber(3)
-  Wall get collidedWall => $_getN(2);
-  @$pb.TagNumber(3)
-  set collidedWall(Wall v) { setField(3, v); }
-  @$pb.TagNumber(3)
-  $core.bool hasCollidedWall() => $_has(2);
-  @$pb.TagNumber(3)
-  void clearCollidedWall() => clearField(3);
-  @$pb.TagNumber(3)
-  Wall ensureCollidedWall() => $_ensure(2);
+  $core.List<WallCollision> get wallCollisions => $_getList(2);
 
   @$pb.TagNumber(4)
   $core.double get time => $_getN(3);
@@ -559,12 +551,82 @@ class GameState extends $pb.GeneratedMessage {
   void clearTime() => clearField(4);
 }
 
+class WallCollision extends $pb.GeneratedMessage {
+  factory WallCollision({
+    Wall? wall,
+    BallState? ballState,
+  }) {
+    final $result = create();
+    if (wall != null) {
+      $result.wall = wall;
+    }
+    if (ballState != null) {
+      $result.ballState = ballState;
+    }
+    return $result;
+  }
+  WallCollision._() : super();
+  factory WallCollision.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
+  factory WallCollision.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'WallCollision', createEmptyInstance: create)
+    ..aOM<Wall>(1, _omitFieldNames ? '' : 'wall', subBuilder: Wall.create)
+    ..aOM<BallState>(2, _omitFieldNames ? '' : 'ballState', subBuilder: BallState.create)
+    ..hasRequiredFields = false
+  ;
+
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
+  'Will be removed in next major version')
+  WallCollision clone() => WallCollision()..mergeFromMessage(this);
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
+  'Will be removed in next major version')
+  WallCollision copyWith(void Function(WallCollision) updates) => super.copyWith((message) => updates(message as WallCollision)) as WallCollision;
+
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  static WallCollision create() => WallCollision._();
+  WallCollision createEmptyInstance() => create();
+  static $pb.PbList<WallCollision> createRepeated() => $pb.PbList<WallCollision>();
+  @$core.pragma('dart2js:noInline')
+  static WallCollision getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<WallCollision>(create);
+  static WallCollision? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  Wall get wall => $_getN(0);
+  @$pb.TagNumber(1)
+  set wall(Wall v) { setField(1, v); }
+  @$pb.TagNumber(1)
+  $core.bool hasWall() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearWall() => clearField(1);
+  @$pb.TagNumber(1)
+  Wall ensureWall() => $_ensure(0);
+
+  @$pb.TagNumber(2)
+  BallState get ballState => $_getN(1);
+  @$pb.TagNumber(2)
+  set ballState(BallState v) { setField(2, v); }
+  @$pb.TagNumber(2)
+  $core.bool hasBallState() => $_has(1);
+  @$pb.TagNumber(2)
+  void clearBallState() => clearField(2);
+  @$pb.TagNumber(2)
+  BallState ensureBallState() => $_ensure(1);
+}
+
 class BallState extends $pb.GeneratedMessage {
   factory BallState({
     $core.double? x,
     $core.double? y,
-    $core.double? v,
-    $core.double? a,
+    $core.double? vx,
+    $core.double? vy,
+    $core.double? ax,
+    $core.double? ay,
   }) {
     final $result = create();
     if (x != null) {
@@ -573,11 +635,17 @@ class BallState extends $pb.GeneratedMessage {
     if (y != null) {
       $result.y = y;
     }
-    if (v != null) {
-      $result.v = v;
+    if (vx != null) {
+      $result.vx = vx;
     }
-    if (a != null) {
-      $result.a = a;
+    if (vy != null) {
+      $result.vy = vy;
+    }
+    if (ax != null) {
+      $result.ax = ax;
+    }
+    if (ay != null) {
+      $result.ay = ay;
     }
     return $result;
   }
@@ -588,8 +656,10 @@ class BallState extends $pb.GeneratedMessage {
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'BallState', createEmptyInstance: create)
     ..a<$core.double>(1, _omitFieldNames ? '' : 'x', $pb.PbFieldType.OD)
     ..a<$core.double>(2, _omitFieldNames ? '' : 'y', $pb.PbFieldType.OD)
-    ..a<$core.double>(3, _omitFieldNames ? '' : 'v', $pb.PbFieldType.OD)
-    ..a<$core.double>(4, _omitFieldNames ? '' : 'a', $pb.PbFieldType.OD)
+    ..a<$core.double>(3, _omitFieldNames ? '' : 'vx', $pb.PbFieldType.OD)
+    ..a<$core.double>(4, _omitFieldNames ? '' : 'vy', $pb.PbFieldType.OD)
+    ..a<$core.double>(5, _omitFieldNames ? '' : 'ax', $pb.PbFieldType.OD)
+    ..a<$core.double>(6, _omitFieldNames ? '' : 'ay', $pb.PbFieldType.OD)
     ..hasRequiredFields = false
   ;
 
@@ -633,22 +703,40 @@ class BallState extends $pb.GeneratedMessage {
   void clearY() => clearField(2);
 
   @$pb.TagNumber(3)
-  $core.double get v => $_getN(2);
+  $core.double get vx => $_getN(2);
   @$pb.TagNumber(3)
-  set v($core.double v) { $_setDouble(2, v); }
+  set vx($core.double v) { $_setDouble(2, v); }
   @$pb.TagNumber(3)
-  $core.bool hasV() => $_has(2);
+  $core.bool hasVx() => $_has(2);
   @$pb.TagNumber(3)
-  void clearV() => clearField(3);
+  void clearVx() => clearField(3);
 
   @$pb.TagNumber(4)
-  $core.double get a => $_getN(3);
+  $core.double get vy => $_getN(3);
   @$pb.TagNumber(4)
-  set a($core.double v) { $_setDouble(3, v); }
+  set vy($core.double v) { $_setDouble(3, v); }
   @$pb.TagNumber(4)
-  $core.bool hasA() => $_has(3);
+  $core.bool hasVy() => $_has(3);
   @$pb.TagNumber(4)
-  void clearA() => clearField(4);
+  void clearVy() => clearField(4);
+
+  @$pb.TagNumber(5)
+  $core.double get ax => $_getN(4);
+  @$pb.TagNumber(5)
+  set ax($core.double v) { $_setDouble(4, v); }
+  @$pb.TagNumber(5)
+  $core.bool hasAx() => $_has(4);
+  @$pb.TagNumber(5)
+  void clearAx() => clearField(5);
+
+  @$pb.TagNumber(6)
+  $core.double get ay => $_getN(5);
+  @$pb.TagNumber(6)
+  set ay($core.double v) { $_setDouble(5, v); }
+  @$pb.TagNumber(6)
+  $core.bool hasAy() => $_has(5);
+  @$pb.TagNumber(6)
+  void clearAy() => clearField(6);
 }
 
 class VisibleWallsState extends $pb.GeneratedMessage {

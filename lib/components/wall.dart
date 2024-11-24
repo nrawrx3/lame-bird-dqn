@@ -3,7 +3,6 @@ import 'dart:math';
 
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
-import 'package:flame_audio/flame_audio.dart';
 import 'package:flutter/widgets.dart';
 import 'package:lame_hexagon/components/ball.dart';
 import 'package:lame_hexagon/my_game.dart';
@@ -115,6 +114,8 @@ class WallComponent extends RectangleComponent
     height = 0;
     game.setBackgroundColor(const Color.fromARGB(150, 206, 253, 235));
     game.lastCollisionType = LastCollisionType.point;
+
+    game.recordWallCollisionEvent(this);
   }
 
   void handleBadCollision() {
@@ -131,6 +132,9 @@ class WallComponent extends RectangleComponent
     game.lastCollisionType = LastCollisionType.bad;
 
     height = 0;
+
+    // Add to the _wallCollsions list.
+    game.recordWallCollisionEvent(this);
 
     if (game.resetLastCollisionToGood != null) {
       game.resetLastCollisionToGood
