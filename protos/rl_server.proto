@@ -1,0 +1,105 @@
+syntax = "proto3";
+
+service RLServer {
+  rpc GetNextCommand(GetNextCommandRequest) returns (Command);
+  rpc SendActionResponse(SendActionResponseRequest) returns (ActionResponse);
+}
+
+message GetNextCommandRequest {
+  GameState game_state = 1;
+  DifficultyParams difficulty_params = 2;
+}
+
+message SendActionResponseRequest {
+  ActionResponse action_response = 1;
+}
+
+message Command {
+  enum CommandType {
+    NOOP = 0;
+    ACTION_JUMP = 1;
+    CREATE_NEW_GAME = 2;
+  }
+
+  CommandType command_type = 1;
+
+  oneof command {
+    ActionJumpCommand action_jump_command = 2;
+    CreateNewGameCommand create_new_game_command = 3;
+  }
+}
+
+message CreateNewGameCommand {
+  GameWorldBounds game_world_bounds = 1;
+  DifficultyParams difficulty_params = 2;
+}
+
+message ActionJumpCommand {
+  double jump_force = 1;
+}
+
+message GameWorldBounds {
+  double view_width = 1;
+  double view_height = 2;
+  double min_wall_gap = 3;
+}
+
+// The model training does not care about these parameters except the pentalty.
+// We're sending these to the Python client just to create logs.
+message DifficultyParams {
+  double ball_max_velocity = 1;
+  double ball_starting_velocity = 2;
+  bool disable_camera_tilt = 3;
+  double ball_nudge_velocity = 4;
+  double noise_scale = 5;
+  double g = 6;
+  double bad_wall_invisible_probability = 7;
+  double max_wall_height = 8;
+  double min_wall_height = 9;
+  int32 bad_wall_penalty = 10;
+  double max_wall_width = 11;
+  double min_wall_width = 12;
+  double ball_radius = 13;
+}
+
+message GameState {
+  BallState ball_state = 1;
+  VisibleWallsState visible_walls_state = 2;
+  repeated WallCollision wall_collisions = 3;
+  double time = 4;
+}
+
+message WallCollision {
+  Wall wall = 1;
+  BallState ball_state = 2; // Ball state at the time of collision
+}
+
+message BallState {
+  double x = 1;
+  double y = 2;
+  double vx = 3;
+  double vy = 4;
+  double ax = 5;
+  double ay = 6;
+}
+
+message VisibleWallsState {
+  repeated Wall walls = 1;
+}
+
+message Wall {
+  double x = 1;
+  double y = 2;
+  double width = 3;
+  double height = 4;
+  double points = 5; // Reward
+}
+
+
+message ActionResponse {
+  GameState game_state = 1;
+  bool game_over = 2;
+  double reward = 3;
+  double penalty = 4;
+  double score = 5;
+}
