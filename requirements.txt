@@ -1,0 +1,22 @@
+betterproto==2.0.0b6
+black==24.10.0
+click==8.1.7
+grpcio @ file:///Users/runner/miniforge3/conda-bld/grpc-split_1730233470042/work
+grpcio-tools @ file:///Users/runner/miniforge3/conda-bld/grpc-split_1730233470042/work/grpcio_tools
+grpclib==0.4.7
+h2==4.1.0
+hpack==4.0.0
+hyperframe==6.0.1
+isort==5.13.2
+Jinja2==3.1.4
+MarkupSafe==3.0.2
+multidict==6.1.0
+mypy-extensions==1.0.0
+packaging==24.2
+pathspec==0.12.1
+platformdirs==4.3.6
+protobuf @ file:///Users/runner/miniforge3/conda-bld/protobuf_1728668363134/work/bazel-bin/python/dist/protobuf-5.28.2-cp313-abi3-macosx_11_0_arm64.whl#sha256=df1cd84354d12a40b97771b044a2a7207b88e3788f766f7570515c22855d52ce
+python-dateutil==2.9.0.post0
+setuptools==75.6.0
+six==1.16.0
+stringcase==1.2.0

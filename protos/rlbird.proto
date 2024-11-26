@@ -1,17 +1,19 @@
 syntax = "proto3";
 
-service RLServer {
+package rlbird;
+
+service RLBirdServer {
   rpc GetNextCommand(GetNextCommandRequest) returns (Command);
-  rpc SendActionResponse(SendActionResponseRequest) returns (ActionResponse);
+  rpc SendCommandResponse(SendCommandResponseRequest) returns (CommandResponse);
 }
+
 
 message GetNextCommandRequest {
-  GameState game_state = 1;
-  DifficultyParams difficulty_params = 2;
+// Empty for now.
 }
 
-message SendActionResponseRequest {
-  ActionResponse action_response = 1;
+message SendCommandResponseRequest {
+  CommandResponse action_response = 1;
 }
 
 message Command {
@@ -23,18 +25,18 @@ message Command {
 
   CommandType command_type = 1;
 
-  oneof command {
-    ActionJumpCommand action_jump_command = 2;
-    CreateNewGameCommand create_new_game_command = 3;
+  oneof data {
+    ActionJumpCommandData action_jump_command = 2;
+    CreateNewGameCommandData create_new_game_command = 3;
   }
 }
 
-message CreateNewGameCommand {
+message CreateNewGameCommandData {
   GameWorldBounds game_world_bounds = 1;
   DifficultyParams difficulty_params = 2;
 }
 
-message ActionJumpCommand {
+message ActionJumpCommandData {
   double jump_force = 1;
 }
 
@@ -96,7 +98,7 @@ message Wall {
 }
 
 
-message ActionResponse {
+message CommandResponse {
   GameState game_state = 1;
   bool game_over = 2;
   double reward = 3;
