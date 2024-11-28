@@ -1,6 +1,6 @@
 //
 //  Generated code. Do not modify.
-//  source: protos/rl_server.proto
+//  source: rlbird.proto
 //
 // @dart = 2.12
 
@@ -13,36 +13,97 @@ import 'dart:convert' as $convert;
 import 'dart:core' as $core;
 import 'dart:typed_data' as $typed_data;
 
-@$core.Deprecated('Use createNewGameRequestDescriptor instead')
-const CreateNewGameRequest$json = {
-  '1': 'CreateNewGameRequest',
+@$core.Deprecated('Use getNextCommandRequestDescriptor instead')
+const GetNextCommandRequest$json = {
+  '1': 'GetNextCommandRequest',
+};
+
+/// Descriptor for `GetNextCommandRequest`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List getNextCommandRequestDescriptor = $convert.base64Decode(
+    'ChVHZXROZXh0Q29tbWFuZFJlcXVlc3Q=');
+
+@$core.Deprecated('Use setCommandResultRequestDescriptor instead')
+const SetCommandResultRequest$json = {
+  '1': 'SetCommandResultRequest',
   '2': [
-    {'1': 'seed', '3': 1, '4': 1, '5': 3, '10': 'seed'},
-    {'1': 'max_walls', '3': 2, '4': 1, '5': 3, '10': 'maxWalls'},
+    {'1': 'command_result', '3': 1, '4': 1, '5': 11, '6': '.rlbird.CommandResult', '10': 'commandResult'},
   ],
 };
 
-/// Descriptor for `CreateNewGameRequest`. Decode as a `google.protobuf.DescriptorProto`.
-final $typed_data.Uint8List createNewGameRequestDescriptor = $convert.base64Decode(
-    'ChRDcmVhdGVOZXdHYW1lUmVxdWVzdBISCgRzZWVkGAEgASgDUgRzZWVkEhsKCW1heF93YWxscx'
-    'gCIAEoA1IIbWF4V2FsbHM=');
+/// Descriptor for `SetCommandResultRequest`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List setCommandResultRequestDescriptor = $convert.base64Decode(
+    'ChdTZXRDb21tYW5kUmVzdWx0UmVxdWVzdBI8Cg5jb21tYW5kX3Jlc3VsdBgBIAEoCzIVLnJsYm'
+    'lyZC5Db21tYW5kUmVzdWx0Ug1jb21tYW5kUmVzdWx0');
 
-@$core.Deprecated('Use createNewGameResponseDescriptor instead')
-const CreateNewGameResponse$json = {
-  '1': 'CreateNewGameResponse',
+@$core.Deprecated('Use setCommandResultResponseDescriptor instead')
+const SetCommandResultResponse$json = {
+  '1': 'SetCommandResultResponse',
+};
+
+/// Descriptor for `SetCommandResultResponse`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List setCommandResultResponseDescriptor = $convert.base64Decode(
+    'ChhTZXRDb21tYW5kUmVzdWx0UmVzcG9uc2U=');
+
+@$core.Deprecated('Use commandDescriptor instead')
+const Command$json = {
+  '1': 'Command',
   '2': [
-    {'1': 'game_world_bounds', '3': 1, '4': 1, '5': 11, '6': '.GameWorldBounds', '10': 'gameWorldBounds'},
-    {'1': 'difficulty_params', '3': 2, '4': 1, '5': 11, '6': '.DifficultyParams', '10': 'difficultyParams'},
-    {'1': 'game_state', '3': 3, '4': 1, '5': 11, '6': '.GameState', '10': 'gameState'},
+    {'1': 'command_type', '3': 1, '4': 1, '5': 14, '6': '.rlbird.Command.CommandType', '10': 'commandType'},
+    {'1': 'action_jump_command', '3': 2, '4': 1, '5': 11, '6': '.rlbird.ActionJumpCommandData', '9': 0, '10': 'actionJumpCommand'},
+    {'1': 'create_new_game_command', '3': 3, '4': 1, '5': 11, '6': '.rlbird.CreateNewGameCommandData', '9': 0, '10': 'createNewGameCommand'},
+  ],
+  '4': [Command_CommandType$json],
+  '8': [
+    {'1': 'data'},
   ],
 };
 
-/// Descriptor for `CreateNewGameResponse`. Decode as a `google.protobuf.DescriptorProto`.
-final $typed_data.Uint8List createNewGameResponseDescriptor = $convert.base64Decode(
-    'ChVDcmVhdGVOZXdHYW1lUmVzcG9uc2USPAoRZ2FtZV93b3JsZF9ib3VuZHMYASABKAsyEC5HYW'
-    '1lV29ybGRCb3VuZHNSD2dhbWVXb3JsZEJvdW5kcxI+ChFkaWZmaWN1bHR5X3BhcmFtcxgCIAEo'
-    'CzIRLkRpZmZpY3VsdHlQYXJhbXNSEGRpZmZpY3VsdHlQYXJhbXMSKQoKZ2FtZV9zdGF0ZRgDIA'
-    'EoCzIKLkdhbWVTdGF0ZVIJZ2FtZVN0YXRl');
+@$core.Deprecated('Use commandDescriptor instead')
+const Command_CommandType$json = {
+  '1': 'CommandType',
+  '2': [
+    {'1': 'NOOP', '2': 0},
+    {'1': 'ACTION_JUMP', '2': 1},
+    {'1': 'CREATE_NEW_GAME', '2': 2},
+  ],
+};
+
+/// Descriptor for `Command`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List commandDescriptor = $convert.base64Decode(
+    'CgdDb21tYW5kEj4KDGNvbW1hbmRfdHlwZRgBIAEoDjIbLnJsYmlyZC5Db21tYW5kLkNvbW1hbm'
+    'RUeXBlUgtjb21tYW5kVHlwZRJPChNhY3Rpb25fanVtcF9jb21tYW5kGAIgASgLMh0ucmxiaXJk'
+    'LkFjdGlvbkp1bXBDb21tYW5kRGF0YUgAUhFhY3Rpb25KdW1wQ29tbWFuZBJZChdjcmVhdGVfbm'
+    'V3X2dhbWVfY29tbWFuZBgDIAEoCzIgLnJsYmlyZC5DcmVhdGVOZXdHYW1lQ29tbWFuZERhdGFI'
+    'AFIUY3JlYXRlTmV3R2FtZUNvbW1hbmQiPQoLQ29tbWFuZFR5cGUSCAoETk9PUBAAEg8KC0FDVE'
+    'lPTl9KVU1QEAESEwoPQ1JFQVRFX05FV19HQU1FEAJCBgoEZGF0YQ==');
+
+@$core.Deprecated('Use createNewGameCommandDataDescriptor instead')
+const CreateNewGameCommandData$json = {
+  '1': 'CreateNewGameCommandData',
+  '2': [
+    {'1': 'game_world_bounds', '3': 1, '4': 1, '5': 11, '6': '.rlbird.GameWorldBounds', '10': 'gameWorldBounds'},
+    {'1': 'difficulty_params', '3': 2, '4': 1, '5': 11, '6': '.rlbird.DifficultyParams', '10': 'difficultyParams'},
+  ],
+};
+
+/// Descriptor for `CreateNewGameCommandData`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List createNewGameCommandDataDescriptor = $convert.base64Decode(
+    'ChhDcmVhdGVOZXdHYW1lQ29tbWFuZERhdGESQwoRZ2FtZV93b3JsZF9ib3VuZHMYASABKAsyFy'
+    '5ybGJpcmQuR2FtZVdvcmxkQm91bmRzUg9nYW1lV29ybGRCb3VuZHMSRQoRZGlmZmljdWx0eV9w'
+    'YXJhbXMYAiABKAsyGC5ybGJpcmQuRGlmZmljdWx0eVBhcmFtc1IQZGlmZmljdWx0eVBhcmFtcw'
+    '==');
+
+@$core.Deprecated('Use actionJumpCommandDataDescriptor instead')
+const ActionJumpCommandData$json = {
+  '1': 'ActionJumpCommandData',
+  '2': [
+    {'1': 'jump_force', '3': 1, '4': 1, '5': 1, '10': 'jumpForce'},
+  ],
+};
+
+/// Descriptor for `ActionJumpCommandData`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List actionJumpCommandDataDescriptor = $convert.base64Decode(
+    'ChVBY3Rpb25KdW1wQ29tbWFuZERhdGESHQoKanVtcF9mb3JjZRgBIAEoAVIJanVtcEZvcmNl');
 
 @$core.Deprecated('Use gameWorldBoundsDescriptor instead')
 const GameWorldBounds$json = {
@@ -98,33 +159,33 @@ final $typed_data.Uint8List difficultyParamsDescriptor = $convert.base64Decode(
 const GameState$json = {
   '1': 'GameState',
   '2': [
-    {'1': 'ball_state', '3': 1, '4': 1, '5': 11, '6': '.BallState', '10': 'ballState'},
-    {'1': 'visible_walls_state', '3': 2, '4': 1, '5': 11, '6': '.VisibleWallsState', '10': 'visibleWallsState'},
-    {'1': 'wall_collisions', '3': 3, '4': 3, '5': 11, '6': '.WallCollision', '10': 'wallCollisions'},
+    {'1': 'ball_state', '3': 1, '4': 1, '5': 11, '6': '.rlbird.BallState', '10': 'ballState'},
+    {'1': 'visible_walls_state', '3': 2, '4': 1, '5': 11, '6': '.rlbird.VisibleWallsState', '10': 'visibleWallsState'},
+    {'1': 'wall_collisions', '3': 3, '4': 3, '5': 11, '6': '.rlbird.WallCollision', '10': 'wallCollisions'},
     {'1': 'time', '3': 4, '4': 1, '5': 1, '10': 'time'},
   ],
 };
 
 /// Descriptor for `GameState`. Decode as a `google.protobuf.DescriptorProto`.
 final $typed_data.Uint8List gameStateDescriptor = $convert.base64Decode(
-    'CglHYW1lU3RhdGUSKQoKYmFsbF9zdGF0ZRgBIAEoCzIKLkJhbGxTdGF0ZVIJYmFsbFN0YXRlEk'
-    'IKE3Zpc2libGVfd2FsbHNfc3RhdGUYAiABKAsyEi5WaXNpYmxlV2FsbHNTdGF0ZVIRdmlzaWJs'
-    'ZVdhbGxzU3RhdGUSNwoPd2FsbF9jb2xsaXNpb25zGAMgAygLMg4uV2FsbENvbGxpc2lvblIOd2'
-    'FsbENvbGxpc2lvbnMSEgoEdGltZRgEIAEoAVIEdGltZQ==');
+    'CglHYW1lU3RhdGUSMAoKYmFsbF9zdGF0ZRgBIAEoCzIRLnJsYmlyZC5CYWxsU3RhdGVSCWJhbG'
+    'xTdGF0ZRJJChN2aXNpYmxlX3dhbGxzX3N0YXRlGAIgASgLMhkucmxiaXJkLlZpc2libGVXYWxs'
+    'c1N0YXRlUhF2aXNpYmxlV2FsbHNTdGF0ZRI+Cg93YWxsX2NvbGxpc2lvbnMYAyADKAsyFS5ybG'
+    'JpcmQuV2FsbENvbGxpc2lvblIOd2FsbENvbGxpc2lvbnMSEgoEdGltZRgEIAEoAVIEdGltZQ==');
 
 @$core.Deprecated('Use wallCollisionDescriptor instead')
 const WallCollision$json = {
   '1': 'WallCollision',
   '2': [
-    {'1': 'wall', '3': 1, '4': 1, '5': 11, '6': '.Wall', '10': 'wall'},
-    {'1': 'ball_state', '3': 2, '4': 1, '5': 11, '6': '.BallState', '10': 'ballState'},
+    {'1': 'wall', '3': 1, '4': 1, '5': 11, '6': '.rlbird.Wall', '10': 'wall'},
+    {'1': 'ball_state', '3': 2, '4': 1, '5': 11, '6': '.rlbird.BallState', '10': 'ballState'},
   ],
 };
 
 /// Descriptor for `WallCollision`. Decode as a `google.protobuf.DescriptorProto`.
 final $typed_data.Uint8List wallCollisionDescriptor = $convert.base64Decode(
-    'Cg1XYWxsQ29sbGlzaW9uEhkKBHdhbGwYASABKAsyBS5XYWxsUgR3YWxsEikKCmJhbGxfc3RhdG'
-    'UYAiABKAsyCi5CYWxsU3RhdGVSCWJhbGxTdGF0ZQ==');
+    'Cg1XYWxsQ29sbGlzaW9uEiAKBHdhbGwYASABKAsyDC5ybGJpcmQuV2FsbFIEd2FsbBIwCgpiYW'
+    'xsX3N0YXRlGAIgASgLMhEucmxiaXJkLkJhbGxTdGF0ZVIJYmFsbFN0YXRl');
 
 @$core.Deprecated('Use ballStateDescriptor instead')
 const BallState$json = {
@@ -148,13 +209,14 @@ final $typed_data.Uint8List ballStateDescriptor = $convert.base64Decode(
 const VisibleWallsState$json = {
   '1': 'VisibleWallsState',
   '2': [
-    {'1': 'walls', '3': 1, '4': 3, '5': 11, '6': '.Wall', '10': 'walls'},
+    {'1': 'walls', '3': 1, '4': 3, '5': 11, '6': '.rlbird.Wall', '10': 'walls'},
   ],
 };
 
 /// Descriptor for `VisibleWallsState`. Decode as a `google.protobuf.DescriptorProto`.
 final $typed_data.Uint8List visibleWallsStateDescriptor = $convert.base64Decode(
-    'ChFWaXNpYmxlV2FsbHNTdGF0ZRIbCgV3YWxscxgBIAMoCzIFLldhbGxSBXdhbGxz');
+    'ChFWaXNpYmxlV2FsbHNTdGF0ZRIiCgV3YWxscxgBIAMoCzIMLnJsYmlyZC5XYWxsUgV3YWxscw'
+    '==');
 
 @$core.Deprecated('Use wallDescriptor instead')
 const Wall$json = {
@@ -173,62 +235,19 @@ final $typed_data.Uint8List wallDescriptor = $convert.base64Decode(
     'CgRXYWxsEgwKAXgYASABKAFSAXgSDAoBeRgCIAEoAVIBeRIUCgV3aWR0aBgDIAEoAVIFd2lkdG'
     'gSFgoGaGVpZ2h0GAQgASgBUgZoZWlnaHQSFgoGcG9pbnRzGAUgASgBUgZwb2ludHM=');
 
-@$core.Deprecated('Use stepGameRequestDescriptor instead')
-const StepGameRequest$json = {
-  '1': 'StepGameRequest',
+@$core.Deprecated('Use commandResultDescriptor instead')
+const CommandResult$json = {
+  '1': 'CommandResult',
   '2': [
-    {'1': 'should_jump', '3': 1, '4': 1, '5': 8, '10': 'shouldJump'},
-  ],
-};
-
-/// Descriptor for `StepGameRequest`. Decode as a `google.protobuf.DescriptorProto`.
-final $typed_data.Uint8List stepGameRequestDescriptor = $convert.base64Decode(
-    'Cg9TdGVwR2FtZVJlcXVlc3QSHwoLc2hvdWxkX2p1bXAYASABKAhSCnNob3VsZEp1bXA=');
-
-@$core.Deprecated('Use stepGameResponseDescriptor instead')
-const StepGameResponse$json = {
-  '1': 'StepGameResponse',
-  '2': [
-    {'1': 'game_state', '3': 1, '4': 1, '5': 11, '6': '.GameState', '10': 'gameState'},
+    {'1': 'game_state', '3': 1, '4': 1, '5': 11, '6': '.rlbird.GameState', '10': 'gameState'},
     {'1': 'game_over', '3': 2, '4': 1, '5': 8, '10': 'gameOver'},
     {'1': 'reward', '3': 3, '4': 1, '5': 1, '10': 'reward'},
-    {'1': 'penalty', '3': 4, '4': 1, '5': 1, '10': 'penalty'},
-    {'1': 'score', '3': 5, '4': 1, '5': 1, '10': 'score'},
   ],
 };
 
-/// Descriptor for `StepGameResponse`. Decode as a `google.protobuf.DescriptorProto`.
-final $typed_data.Uint8List stepGameResponseDescriptor = $convert.base64Decode(
-    'ChBTdGVwR2FtZVJlc3BvbnNlEikKCmdhbWVfc3RhdGUYASABKAsyCi5HYW1lU3RhdGVSCWdhbW'
-    'VTdGF0ZRIbCglnYW1lX292ZXIYAiABKAhSCGdhbWVPdmVyEhYKBnJld2FyZBgDIAEoAVIGcmV3'
-    'YXJkEhgKB3BlbmFsdHkYBCABKAFSB3BlbmFsdHkSFAoFc2NvcmUYBSABKAFSBXNjb3Jl');
-
-const $core.Map<$core.String, $core.dynamic> RLServerServiceBase$json = {
-  '1': 'RLServer',
-  '2': [
-    {'1': 'CreateNewGame', '2': '.CreateNewGameRequest', '3': '.CreateNewGameResponse', '4': {}},
-    {'1': 'StepGame', '2': '.StepGameRequest', '3': '.StepGameResponse', '4': {}},
-  ],
-};
-
-@$core.Deprecated('Use rLServerServiceDescriptor instead')
-const $core.Map<$core.String, $core.Map<$core.String, $core.dynamic>> RLServerServiceBase$messageJson = {
-  '.CreateNewGameRequest': CreateNewGameRequest$json,
-  '.CreateNewGameResponse': CreateNewGameResponse$json,
-  '.GameWorldBounds': GameWorldBounds$json,
-  '.DifficultyParams': DifficultyParams$json,
-  '.GameState': GameState$json,
-  '.BallState': BallState$json,
-  '.VisibleWallsState': VisibleWallsState$json,
-  '.Wall': Wall$json,
-  '.WallCollision': WallCollision$json,
-  '.StepGameRequest': StepGameRequest$json,
-  '.StepGameResponse': StepGameResponse$json,
-};
-
-/// Descriptor for `RLServer`. Decode as a `google.protobuf.ServiceDescriptorProto`.
-final $typed_data.Uint8List rLServerServiceDescriptor = $convert.base64Decode(
-    'CghSTFNlcnZlchJACg1DcmVhdGVOZXdHYW1lEhUuQ3JlYXRlTmV3R2FtZVJlcXVlc3QaFi5Dcm'
-    'VhdGVOZXdHYW1lUmVzcG9uc2UiABIxCghTdGVwR2FtZRIQLlN0ZXBHYW1lUmVxdWVzdBoRLlN0'
-    'ZXBHYW1lUmVzcG9uc2UiAA==');
+/// Descriptor for `CommandResult`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List commandResultDescriptor = $convert.base64Decode(
+    'Cg1Db21tYW5kUmVzdWx0EjAKCmdhbWVfc3RhdGUYASABKAsyES5ybGJpcmQuR2FtZVN0YXRlUg'
+    'lnYW1lU3RhdGUSGwoJZ2FtZV9vdmVyGAIgASgIUghnYW1lT3ZlchIWCgZyZXdhcmQYAyABKAFS'
+    'BnJld2FyZA==');
 

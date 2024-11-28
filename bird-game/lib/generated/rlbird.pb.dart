@@ -1,6 +1,6 @@
 //
 //  Generated code. Do not modify.
-//  source: protos/rl_server.proto
+//  source: rlbird.proto
 //
 // @dart = 2.12
 
@@ -9,33 +9,21 @@
 // ignore_for_file: non_constant_identifier_names, prefer_final_fields
 // ignore_for_file: unnecessary_import, unnecessary_this, unused_import
 
-import 'dart:async' as $async;
 import 'dart:core' as $core;
 
-import 'package:fixnum/fixnum.dart' as $fixnum;
 import 'package:protobuf/protobuf.dart' as $pb;
 
-class CreateNewGameRequest extends $pb.GeneratedMessage {
-  factory CreateNewGameRequest({
-    $fixnum.Int64? seed,
-    $fixnum.Int64? maxWalls,
-  }) {
-    final $result = create();
-    if (seed != null) {
-      $result.seed = seed;
-    }
-    if (maxWalls != null) {
-      $result.maxWalls = maxWalls;
-    }
-    return $result;
-  }
-  CreateNewGameRequest._() : super();
-  factory CreateNewGameRequest.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
-  factory CreateNewGameRequest.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
+import 'rlbird.pbenum.dart';
 
-  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'CreateNewGameRequest', createEmptyInstance: create)
-    ..aInt64(1, _omitFieldNames ? '' : 'seed')
-    ..aInt64(2, _omitFieldNames ? '' : 'maxWalls')
+export 'rlbird.pbenum.dart';
+
+class GetNextCommandRequest extends $pb.GeneratedMessage {
+  factory GetNextCommandRequest() => create();
+  GetNextCommandRequest._() : super();
+  factory GetNextCommandRequest.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
+  factory GetNextCommandRequest.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'GetNextCommandRequest', package: const $pb.PackageName(_omitMessageNames ? '' : 'rlbird'), createEmptyInstance: create)
     ..hasRequiredFields = false
   ;
 
@@ -43,47 +31,210 @@ class CreateNewGameRequest extends $pb.GeneratedMessage {
   'Using this can add significant overhead to your binary. '
   'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
   'Will be removed in next major version')
-  CreateNewGameRequest clone() => CreateNewGameRequest()..mergeFromMessage(this);
+  GetNextCommandRequest clone() => GetNextCommandRequest()..mergeFromMessage(this);
   @$core.Deprecated(
   'Using this can add significant overhead to your binary. '
   'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
   'Will be removed in next major version')
-  CreateNewGameRequest copyWith(void Function(CreateNewGameRequest) updates) => super.copyWith((message) => updates(message as CreateNewGameRequest)) as CreateNewGameRequest;
+  GetNextCommandRequest copyWith(void Function(GetNextCommandRequest) updates) => super.copyWith((message) => updates(message as GetNextCommandRequest)) as GetNextCommandRequest;
 
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
-  static CreateNewGameRequest create() => CreateNewGameRequest._();
-  CreateNewGameRequest createEmptyInstance() => create();
-  static $pb.PbList<CreateNewGameRequest> createRepeated() => $pb.PbList<CreateNewGameRequest>();
+  static GetNextCommandRequest create() => GetNextCommandRequest._();
+  GetNextCommandRequest createEmptyInstance() => create();
+  static $pb.PbList<GetNextCommandRequest> createRepeated() => $pb.PbList<GetNextCommandRequest>();
   @$core.pragma('dart2js:noInline')
-  static CreateNewGameRequest getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<CreateNewGameRequest>(create);
-  static CreateNewGameRequest? _defaultInstance;
-
-  @$pb.TagNumber(1)
-  $fixnum.Int64 get seed => $_getI64(0);
-  @$pb.TagNumber(1)
-  set seed($fixnum.Int64 v) { $_setInt64(0, v); }
-  @$pb.TagNumber(1)
-  $core.bool hasSeed() => $_has(0);
-  @$pb.TagNumber(1)
-  void clearSeed() => clearField(1);
-
-  @$pb.TagNumber(2)
-  $fixnum.Int64 get maxWalls => $_getI64(1);
-  @$pb.TagNumber(2)
-  set maxWalls($fixnum.Int64 v) { $_setInt64(1, v); }
-  @$pb.TagNumber(2)
-  $core.bool hasMaxWalls() => $_has(1);
-  @$pb.TagNumber(2)
-  void clearMaxWalls() => clearField(2);
+  static GetNextCommandRequest getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<GetNextCommandRequest>(create);
+  static GetNextCommandRequest? _defaultInstance;
 }
 
-class CreateNewGameResponse extends $pb.GeneratedMessage {
-  factory CreateNewGameResponse({
+class SetCommandResultRequest extends $pb.GeneratedMessage {
+  factory SetCommandResultRequest({
+    CommandResult? commandResult,
+  }) {
+    final $result = create();
+    if (commandResult != null) {
+      $result.commandResult = commandResult;
+    }
+    return $result;
+  }
+  SetCommandResultRequest._() : super();
+  factory SetCommandResultRequest.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
+  factory SetCommandResultRequest.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'SetCommandResultRequest', package: const $pb.PackageName(_omitMessageNames ? '' : 'rlbird'), createEmptyInstance: create)
+    ..aOM<CommandResult>(1, _omitFieldNames ? '' : 'commandResult', subBuilder: CommandResult.create)
+    ..hasRequiredFields = false
+  ;
+
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
+  'Will be removed in next major version')
+  SetCommandResultRequest clone() => SetCommandResultRequest()..mergeFromMessage(this);
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
+  'Will be removed in next major version')
+  SetCommandResultRequest copyWith(void Function(SetCommandResultRequest) updates) => super.copyWith((message) => updates(message as SetCommandResultRequest)) as SetCommandResultRequest;
+
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  static SetCommandResultRequest create() => SetCommandResultRequest._();
+  SetCommandResultRequest createEmptyInstance() => create();
+  static $pb.PbList<SetCommandResultRequest> createRepeated() => $pb.PbList<SetCommandResultRequest>();
+  @$core.pragma('dart2js:noInline')
+  static SetCommandResultRequest getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<SetCommandResultRequest>(create);
+  static SetCommandResultRequest? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  CommandResult get commandResult => $_getN(0);
+  @$pb.TagNumber(1)
+  set commandResult(CommandResult v) { setField(1, v); }
+  @$pb.TagNumber(1)
+  $core.bool hasCommandResult() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearCommandResult() => clearField(1);
+  @$pb.TagNumber(1)
+  CommandResult ensureCommandResult() => $_ensure(0);
+}
+
+class SetCommandResultResponse extends $pb.GeneratedMessage {
+  factory SetCommandResultResponse() => create();
+  SetCommandResultResponse._() : super();
+  factory SetCommandResultResponse.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
+  factory SetCommandResultResponse.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'SetCommandResultResponse', package: const $pb.PackageName(_omitMessageNames ? '' : 'rlbird'), createEmptyInstance: create)
+    ..hasRequiredFields = false
+  ;
+
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
+  'Will be removed in next major version')
+  SetCommandResultResponse clone() => SetCommandResultResponse()..mergeFromMessage(this);
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
+  'Will be removed in next major version')
+  SetCommandResultResponse copyWith(void Function(SetCommandResultResponse) updates) => super.copyWith((message) => updates(message as SetCommandResultResponse)) as SetCommandResultResponse;
+
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  static SetCommandResultResponse create() => SetCommandResultResponse._();
+  SetCommandResultResponse createEmptyInstance() => create();
+  static $pb.PbList<SetCommandResultResponse> createRepeated() => $pb.PbList<SetCommandResultResponse>();
+  @$core.pragma('dart2js:noInline')
+  static SetCommandResultResponse getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<SetCommandResultResponse>(create);
+  static SetCommandResultResponse? _defaultInstance;
+}
+
+enum Command_Data {
+  actionJumpCommand, 
+  createNewGameCommand, 
+  notSet
+}
+
+class Command extends $pb.GeneratedMessage {
+  factory Command({
+    Command_CommandType? commandType,
+    ActionJumpCommandData? actionJumpCommand,
+    CreateNewGameCommandData? createNewGameCommand,
+  }) {
+    final $result = create();
+    if (commandType != null) {
+      $result.commandType = commandType;
+    }
+    if (actionJumpCommand != null) {
+      $result.actionJumpCommand = actionJumpCommand;
+    }
+    if (createNewGameCommand != null) {
+      $result.createNewGameCommand = createNewGameCommand;
+    }
+    return $result;
+  }
+  Command._() : super();
+  factory Command.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
+  factory Command.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
+
+  static const $core.Map<$core.int, Command_Data> _Command_DataByTag = {
+    2 : Command_Data.actionJumpCommand,
+    3 : Command_Data.createNewGameCommand,
+    0 : Command_Data.notSet
+  };
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'Command', package: const $pb.PackageName(_omitMessageNames ? '' : 'rlbird'), createEmptyInstance: create)
+    ..oo(0, [2, 3])
+    ..e<Command_CommandType>(1, _omitFieldNames ? '' : 'commandType', $pb.PbFieldType.OE, defaultOrMaker: Command_CommandType.NOOP, valueOf: Command_CommandType.valueOf, enumValues: Command_CommandType.values)
+    ..aOM<ActionJumpCommandData>(2, _omitFieldNames ? '' : 'actionJumpCommand', subBuilder: ActionJumpCommandData.create)
+    ..aOM<CreateNewGameCommandData>(3, _omitFieldNames ? '' : 'createNewGameCommand', subBuilder: CreateNewGameCommandData.create)
+    ..hasRequiredFields = false
+  ;
+
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
+  'Will be removed in next major version')
+  Command clone() => Command()..mergeFromMessage(this);
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
+  'Will be removed in next major version')
+  Command copyWith(void Function(Command) updates) => super.copyWith((message) => updates(message as Command)) as Command;
+
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  static Command create() => Command._();
+  Command createEmptyInstance() => create();
+  static $pb.PbList<Command> createRepeated() => $pb.PbList<Command>();
+  @$core.pragma('dart2js:noInline')
+  static Command getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<Command>(create);
+  static Command? _defaultInstance;
+
+  Command_Data whichData() => _Command_DataByTag[$_whichOneof(0)]!;
+  void clearData() => clearField($_whichOneof(0));
+
+  @$pb.TagNumber(1)
+  Command_CommandType get commandType => $_getN(0);
+  @$pb.TagNumber(1)
+  set commandType(Command_CommandType v) { setField(1, v); }
+  @$pb.TagNumber(1)
+  $core.bool hasCommandType() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearCommandType() => clearField(1);
+
+  @$pb.TagNumber(2)
+  ActionJumpCommandData get actionJumpCommand => $_getN(1);
+  @$pb.TagNumber(2)
+  set actionJumpCommand(ActionJumpCommandData v) { setField(2, v); }
+  @$pb.TagNumber(2)
+  $core.bool hasActionJumpCommand() => $_has(1);
+  @$pb.TagNumber(2)
+  void clearActionJumpCommand() => clearField(2);
+  @$pb.TagNumber(2)
+  ActionJumpCommandData ensureActionJumpCommand() => $_ensure(1);
+
+  @$pb.TagNumber(3)
+  CreateNewGameCommandData get createNewGameCommand => $_getN(2);
+  @$pb.TagNumber(3)
+  set createNewGameCommand(CreateNewGameCommandData v) { setField(3, v); }
+  @$pb.TagNumber(3)
+  $core.bool hasCreateNewGameCommand() => $_has(2);
+  @$pb.TagNumber(3)
+  void clearCreateNewGameCommand() => clearField(3);
+  @$pb.TagNumber(3)
+  CreateNewGameCommandData ensureCreateNewGameCommand() => $_ensure(2);
+}
+
+/// Ignored. We're hardcoding this in the game side.
+class CreateNewGameCommandData extends $pb.GeneratedMessage {
+  factory CreateNewGameCommandData({
     GameWorldBounds? gameWorldBounds,
     DifficultyParams? difficultyParams,
-    GameState? gameState,
   }) {
     final $result = create();
     if (gameWorldBounds != null) {
@@ -92,19 +243,15 @@ class CreateNewGameResponse extends $pb.GeneratedMessage {
     if (difficultyParams != null) {
       $result.difficultyParams = difficultyParams;
     }
-    if (gameState != null) {
-      $result.gameState = gameState;
-    }
     return $result;
   }
-  CreateNewGameResponse._() : super();
-  factory CreateNewGameResponse.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
-  factory CreateNewGameResponse.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
+  CreateNewGameCommandData._() : super();
+  factory CreateNewGameCommandData.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
+  factory CreateNewGameCommandData.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
 
-  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'CreateNewGameResponse', createEmptyInstance: create)
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'CreateNewGameCommandData', package: const $pb.PackageName(_omitMessageNames ? '' : 'rlbird'), createEmptyInstance: create)
     ..aOM<GameWorldBounds>(1, _omitFieldNames ? '' : 'gameWorldBounds', subBuilder: GameWorldBounds.create)
     ..aOM<DifficultyParams>(2, _omitFieldNames ? '' : 'difficultyParams', subBuilder: DifficultyParams.create)
-    ..aOM<GameState>(3, _omitFieldNames ? '' : 'gameState', subBuilder: GameState.create)
     ..hasRequiredFields = false
   ;
 
@@ -112,22 +259,22 @@ class CreateNewGameResponse extends $pb.GeneratedMessage {
   'Using this can add significant overhead to your binary. '
   'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
   'Will be removed in next major version')
-  CreateNewGameResponse clone() => CreateNewGameResponse()..mergeFromMessage(this);
+  CreateNewGameCommandData clone() => CreateNewGameCommandData()..mergeFromMessage(this);
   @$core.Deprecated(
   'Using this can add significant overhead to your binary. '
   'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
   'Will be removed in next major version')
-  CreateNewGameResponse copyWith(void Function(CreateNewGameResponse) updates) => super.copyWith((message) => updates(message as CreateNewGameResponse)) as CreateNewGameResponse;
+  CreateNewGameCommandData copyWith(void Function(CreateNewGameCommandData) updates) => super.copyWith((message) => updates(message as CreateNewGameCommandData)) as CreateNewGameCommandData;
 
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
-  static CreateNewGameResponse create() => CreateNewGameResponse._();
-  CreateNewGameResponse createEmptyInstance() => create();
-  static $pb.PbList<CreateNewGameResponse> createRepeated() => $pb.PbList<CreateNewGameResponse>();
+  static CreateNewGameCommandData create() => CreateNewGameCommandData._();
+  CreateNewGameCommandData createEmptyInstance() => create();
+  static $pb.PbList<CreateNewGameCommandData> createRepeated() => $pb.PbList<CreateNewGameCommandData>();
   @$core.pragma('dart2js:noInline')
-  static CreateNewGameResponse getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<CreateNewGameResponse>(create);
-  static CreateNewGameResponse? _defaultInstance;
+  static CreateNewGameCommandData getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<CreateNewGameCommandData>(create);
+  static CreateNewGameCommandData? _defaultInstance;
 
   @$pb.TagNumber(1)
   GameWorldBounds get gameWorldBounds => $_getN(0);
@@ -150,17 +297,56 @@ class CreateNewGameResponse extends $pb.GeneratedMessage {
   void clearDifficultyParams() => clearField(2);
   @$pb.TagNumber(2)
   DifficultyParams ensureDifficultyParams() => $_ensure(1);
+}
 
-  @$pb.TagNumber(3)
-  GameState get gameState => $_getN(2);
-  @$pb.TagNumber(3)
-  set gameState(GameState v) { setField(3, v); }
-  @$pb.TagNumber(3)
-  $core.bool hasGameState() => $_has(2);
-  @$pb.TagNumber(3)
-  void clearGameState() => clearField(3);
-  @$pb.TagNumber(3)
-  GameState ensureGameState() => $_ensure(2);
+class ActionJumpCommandData extends $pb.GeneratedMessage {
+  factory ActionJumpCommandData({
+    $core.double? jumpForce,
+  }) {
+    final $result = create();
+    if (jumpForce != null) {
+      $result.jumpForce = jumpForce;
+    }
+    return $result;
+  }
+  ActionJumpCommandData._() : super();
+  factory ActionJumpCommandData.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
+  factory ActionJumpCommandData.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'ActionJumpCommandData', package: const $pb.PackageName(_omitMessageNames ? '' : 'rlbird'), createEmptyInstance: create)
+    ..a<$core.double>(1, _omitFieldNames ? '' : 'jumpForce', $pb.PbFieldType.OD)
+    ..hasRequiredFields = false
+  ;
+
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
+  'Will be removed in next major version')
+  ActionJumpCommandData clone() => ActionJumpCommandData()..mergeFromMessage(this);
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
+  'Will be removed in next major version')
+  ActionJumpCommandData copyWith(void Function(ActionJumpCommandData) updates) => super.copyWith((message) => updates(message as ActionJumpCommandData)) as ActionJumpCommandData;
+
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  static ActionJumpCommandData create() => ActionJumpCommandData._();
+  ActionJumpCommandData createEmptyInstance() => create();
+  static $pb.PbList<ActionJumpCommandData> createRepeated() => $pb.PbList<ActionJumpCommandData>();
+  @$core.pragma('dart2js:noInline')
+  static ActionJumpCommandData getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<ActionJumpCommandData>(create);
+  static ActionJumpCommandData? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  $core.double get jumpForce => $_getN(0);
+  @$pb.TagNumber(1)
+  set jumpForce($core.double v) { $_setDouble(0, v); }
+  @$pb.TagNumber(1)
+  $core.bool hasJumpForce() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearJumpForce() => clearField(1);
 }
 
 class GameWorldBounds extends $pb.GeneratedMessage {
@@ -185,7 +371,7 @@ class GameWorldBounds extends $pb.GeneratedMessage {
   factory GameWorldBounds.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
   factory GameWorldBounds.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
 
-  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'GameWorldBounds', createEmptyInstance: create)
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'GameWorldBounds', package: const $pb.PackageName(_omitMessageNames ? '' : 'rlbird'), createEmptyInstance: create)
     ..a<$core.double>(1, _omitFieldNames ? '' : 'viewWidth', $pb.PbFieldType.OD)
     ..a<$core.double>(2, _omitFieldNames ? '' : 'viewHeight', $pb.PbFieldType.OD)
     ..a<$core.double>(3, _omitFieldNames ? '' : 'minWallGap', $pb.PbFieldType.OD)
@@ -305,7 +491,7 @@ class DifficultyParams extends $pb.GeneratedMessage {
   factory DifficultyParams.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
   factory DifficultyParams.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
 
-  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'DifficultyParams', createEmptyInstance: create)
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'DifficultyParams', package: const $pb.PackageName(_omitMessageNames ? '' : 'rlbird'), createEmptyInstance: create)
     ..a<$core.double>(1, _omitFieldNames ? '' : 'ballMaxVelocity', $pb.PbFieldType.OD)
     ..a<$core.double>(2, _omitFieldNames ? '' : 'ballStartingVelocity', $pb.PbFieldType.OD)
     ..aOB(3, _omitFieldNames ? '' : 'disableCameraTilt')
@@ -487,7 +673,7 @@ class GameState extends $pb.GeneratedMessage {
   factory GameState.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
   factory GameState.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
 
-  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'GameState', createEmptyInstance: create)
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'GameState', package: const $pb.PackageName(_omitMessageNames ? '' : 'rlbird'), createEmptyInstance: create)
     ..aOM<BallState>(1, _omitFieldNames ? '' : 'ballState', subBuilder: BallState.create)
     ..aOM<VisibleWallsState>(2, _omitFieldNames ? '' : 'visibleWallsState', subBuilder: VisibleWallsState.create)
     ..pc<WallCollision>(3, _omitFieldNames ? '' : 'wallCollisions', $pb.PbFieldType.PM, subBuilder: WallCollision.create)
@@ -569,7 +755,7 @@ class WallCollision extends $pb.GeneratedMessage {
   factory WallCollision.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
   factory WallCollision.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
 
-  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'WallCollision', createEmptyInstance: create)
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'WallCollision', package: const $pb.PackageName(_omitMessageNames ? '' : 'rlbird'), createEmptyInstance: create)
     ..aOM<Wall>(1, _omitFieldNames ? '' : 'wall', subBuilder: Wall.create)
     ..aOM<BallState>(2, _omitFieldNames ? '' : 'ballState', subBuilder: BallState.create)
     ..hasRequiredFields = false
@@ -653,7 +839,7 @@ class BallState extends $pb.GeneratedMessage {
   factory BallState.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
   factory BallState.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
 
-  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'BallState', createEmptyInstance: create)
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'BallState', package: const $pb.PackageName(_omitMessageNames ? '' : 'rlbird'), createEmptyInstance: create)
     ..a<$core.double>(1, _omitFieldNames ? '' : 'x', $pb.PbFieldType.OD)
     ..a<$core.double>(2, _omitFieldNames ? '' : 'y', $pb.PbFieldType.OD)
     ..a<$core.double>(3, _omitFieldNames ? '' : 'vx', $pb.PbFieldType.OD)
@@ -753,7 +939,7 @@ class VisibleWallsState extends $pb.GeneratedMessage {
   factory VisibleWallsState.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
   factory VisibleWallsState.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
 
-  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'VisibleWallsState', createEmptyInstance: create)
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'VisibleWallsState', package: const $pb.PackageName(_omitMessageNames ? '' : 'rlbird'), createEmptyInstance: create)
     ..pc<Wall>(1, _omitFieldNames ? '' : 'walls', $pb.PbFieldType.PM, subBuilder: Wall.create)
     ..hasRequiredFields = false
   ;
@@ -813,7 +999,7 @@ class Wall extends $pb.GeneratedMessage {
   factory Wall.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
   factory Wall.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
 
-  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'Wall', createEmptyInstance: create)
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'Wall', package: const $pb.PackageName(_omitMessageNames ? '' : 'rlbird'), createEmptyInstance: create)
     ..a<$core.double>(1, _omitFieldNames ? '' : 'x', $pb.PbFieldType.OD)
     ..a<$core.double>(2, _omitFieldNames ? '' : 'y', $pb.PbFieldType.OD)
     ..a<$core.double>(3, _omitFieldNames ? '' : 'width', $pb.PbFieldType.OD)
@@ -889,63 +1075,11 @@ class Wall extends $pb.GeneratedMessage {
   void clearPoints() => clearField(5);
 }
 
-class StepGameRequest extends $pb.GeneratedMessage {
-  factory StepGameRequest({
-    $core.bool? shouldJump,
-  }) {
-    final $result = create();
-    if (shouldJump != null) {
-      $result.shouldJump = shouldJump;
-    }
-    return $result;
-  }
-  StepGameRequest._() : super();
-  factory StepGameRequest.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
-  factory StepGameRequest.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
-
-  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'StepGameRequest', createEmptyInstance: create)
-    ..aOB(1, _omitFieldNames ? '' : 'shouldJump')
-    ..hasRequiredFields = false
-  ;
-
-  @$core.Deprecated(
-  'Using this can add significant overhead to your binary. '
-  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
-  'Will be removed in next major version')
-  StepGameRequest clone() => StepGameRequest()..mergeFromMessage(this);
-  @$core.Deprecated(
-  'Using this can add significant overhead to your binary. '
-  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
-  'Will be removed in next major version')
-  StepGameRequest copyWith(void Function(StepGameRequest) updates) => super.copyWith((message) => updates(message as StepGameRequest)) as StepGameRequest;
-
-  $pb.BuilderInfo get info_ => _i;
-
-  @$core.pragma('dart2js:noInline')
-  static StepGameRequest create() => StepGameRequest._();
-  StepGameRequest createEmptyInstance() => create();
-  static $pb.PbList<StepGameRequest> createRepeated() => $pb.PbList<StepGameRequest>();
-  @$core.pragma('dart2js:noInline')
-  static StepGameRequest getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<StepGameRequest>(create);
-  static StepGameRequest? _defaultInstance;
-
-  @$pb.TagNumber(1)
-  $core.bool get shouldJump => $_getBF(0);
-  @$pb.TagNumber(1)
-  set shouldJump($core.bool v) { $_setBool(0, v); }
-  @$pb.TagNumber(1)
-  $core.bool hasShouldJump() => $_has(0);
-  @$pb.TagNumber(1)
-  void clearShouldJump() => clearField(1);
-}
-
-class StepGameResponse extends $pb.GeneratedMessage {
-  factory StepGameResponse({
+class CommandResult extends $pb.GeneratedMessage {
+  factory CommandResult({
     GameState? gameState,
     $core.bool? gameOver,
     $core.double? reward,
-    $core.double? penalty,
-    $core.double? score,
   }) {
     final $result = create();
     if (gameState != null) {
@@ -957,24 +1091,16 @@ class StepGameResponse extends $pb.GeneratedMessage {
     if (reward != null) {
       $result.reward = reward;
     }
-    if (penalty != null) {
-      $result.penalty = penalty;
-    }
-    if (score != null) {
-      $result.score = score;
-    }
     return $result;
   }
-  StepGameResponse._() : super();
-  factory StepGameResponse.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
-  factory StepGameResponse.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
+  CommandResult._() : super();
+  factory CommandResult.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
+  factory CommandResult.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
 
-  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'StepGameResponse', createEmptyInstance: create)
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'CommandResult', package: const $pb.PackageName(_omitMessageNames ? '' : 'rlbird'), createEmptyInstance: create)
     ..aOM<GameState>(1, _omitFieldNames ? '' : 'gameState', subBuilder: GameState.create)
     ..aOB(2, _omitFieldNames ? '' : 'gameOver')
     ..a<$core.double>(3, _omitFieldNames ? '' : 'reward', $pb.PbFieldType.OD)
-    ..a<$core.double>(4, _omitFieldNames ? '' : 'penalty', $pb.PbFieldType.OD)
-    ..a<$core.double>(5, _omitFieldNames ? '' : 'score', $pb.PbFieldType.OD)
     ..hasRequiredFields = false
   ;
 
@@ -982,22 +1108,22 @@ class StepGameResponse extends $pb.GeneratedMessage {
   'Using this can add significant overhead to your binary. '
   'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
   'Will be removed in next major version')
-  StepGameResponse clone() => StepGameResponse()..mergeFromMessage(this);
+  CommandResult clone() => CommandResult()..mergeFromMessage(this);
   @$core.Deprecated(
   'Using this can add significant overhead to your binary. '
   'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
   'Will be removed in next major version')
-  StepGameResponse copyWith(void Function(StepGameResponse) updates) => super.copyWith((message) => updates(message as StepGameResponse)) as StepGameResponse;
+  CommandResult copyWith(void Function(CommandResult) updates) => super.copyWith((message) => updates(message as CommandResult)) as CommandResult;
 
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
-  static StepGameResponse create() => StepGameResponse._();
-  StepGameResponse createEmptyInstance() => create();
-  static $pb.PbList<StepGameResponse> createRepeated() => $pb.PbList<StepGameResponse>();
+  static CommandResult create() => CommandResult._();
+  CommandResult createEmptyInstance() => create();
+  static $pb.PbList<CommandResult> createRepeated() => $pb.PbList<CommandResult>();
   @$core.pragma('dart2js:noInline')
-  static StepGameResponse getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<StepGameResponse>(create);
-  static StepGameResponse? _defaultInstance;
+  static CommandResult getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<CommandResult>(create);
+  static CommandResult? _defaultInstance;
 
   @$pb.TagNumber(1)
   GameState get gameState => $_getN(0);
@@ -1027,36 +1153,6 @@ class StepGameResponse extends $pb.GeneratedMessage {
   $core.bool hasReward() => $_has(2);
   @$pb.TagNumber(3)
   void clearReward() => clearField(3);
-
-  @$pb.TagNumber(4)
-  $core.double get penalty => $_getN(3);
-  @$pb.TagNumber(4)
-  set penalty($core.double v) { $_setDouble(3, v); }
-  @$pb.TagNumber(4)
-  $core.bool hasPenalty() => $_has(3);
-  @$pb.TagNumber(4)
-  void clearPenalty() => clearField(4);
-
-  @$pb.TagNumber(5)
-  $core.double get score => $_getN(4);
-  @$pb.TagNumber(5)
-  set score($core.double v) { $_setDouble(4, v); }
-  @$pb.TagNumber(5)
-  $core.bool hasScore() => $_has(4);
-  @$pb.TagNumber(5)
-  void clearScore() => clearField(5);
-}
-
-class RLServerApi {
-  $pb.RpcClient _client;
-  RLServerApi(this._client);
-
-  $async.Future<CreateNewGameResponse> createNewGame($pb.ClientContext? ctx, CreateNewGameRequest request) =>
-    _client.invoke<CreateNewGameResponse>(ctx, 'RLServer', 'CreateNewGame', request, CreateNewGameResponse())
-  ;
-  $async.Future<StepGameResponse> stepGame($pb.ClientContext? ctx, StepGameRequest request) =>
-    _client.invoke<StepGameResponse>(ctx, 'RLServer', 'StepGame', request, StepGameResponse())
-  ;
 }
 
 

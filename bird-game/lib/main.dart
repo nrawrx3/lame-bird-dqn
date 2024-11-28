@@ -1,8 +1,7 @@
 import 'package:flame/flame.dart';
 import 'package:flutter/material.dart';
-import 'package:grpc/grpc.dart';
 import 'package:lame_hexagon/app_selector.dart';
-import 'package:lame_hexagon/rl_server.dart';
+import 'package:lame_hexagon/rlbird_client.dart';
 import 'package:provider/provider.dart';
 
 void main() async {
@@ -10,16 +9,10 @@ void main() async {
   Flame.device.setLandscape();
 
   // Need the reference to the inner server object so we can set a reference to MyGame in it.
-  final rlServer = RLServer();
+  final rlClient = RLBirdClient("127.0.0.1", 50051);
 
-  final grpcServer = Server.create(services: [rlServer]);
-
-  runApp(Provider<RLServer>(
-    create: (_) => rlServer,
+  runApp(Provider<RLBirdClient>(
+    create: (_) => rlClient,
     child: const AppSelector(),
   ));
-
-  await grpcServer.serve(port: 50051);
-
-  debugPrint('Server listening on port ${grpcServer.port}');
 }

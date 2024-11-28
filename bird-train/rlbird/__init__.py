@@ -34,8 +34,13 @@ class GetNextCommandRequest(betterproto.Message):
 
 
 @dataclass(eq=False, repr=False)
-class SendCommandResponseRequest(betterproto.Message):
-    action_response: "CommandResponse" = betterproto.message_field(1)
+class SetCommandResultRequest(betterproto.Message):
+    command_result: "CommandResult" = betterproto.message_field(1)
+
+
+@dataclass(eq=False, repr=False)
+class SetCommandResultResponse(betterproto.Message):
+    pass
 
 
 @dataclass(eq=False, repr=False)
@@ -51,6 +56,8 @@ class Command(betterproto.Message):
 
 @dataclass(eq=False, repr=False)
 class CreateNewGameCommandData(betterproto.Message):
+    """Ignored. We're hardcoding this in the game side."""
+
     game_world_bounds: "GameWorldBounds" = betterproto.message_field(1)
     difficulty_params: "DifficultyParams" = betterproto.message_field(2)
 
@@ -128,12 +135,10 @@ class Wall(betterproto.Message):
 
 
 @dataclass(eq=False, repr=False)
-class CommandResponse(betterproto.Message):
+class CommandResult(betterproto.Message):
     game_state: "GameState" = betterproto.message_field(1)
     game_over: bool = betterproto.bool_field(2)
     reward: float = betterproto.double_field(3)
-    penalty: float = betterproto.double_field(4)
-    score: float = betterproto.double_field(5)
 
 
 class RlBirdServerStub(betterproto.ServiceStub):
@@ -154,18 +159,18 @@ class RlBirdServerStub(betterproto.ServiceStub):
             metadata=metadata,
         )
 
-    async def send_command_response(
+    async def set_command_result(
         self,
-        send_command_response_request: "SendCommandResponseRequest",
+        set_command_result_request: "SetCommandResultRequest",
         *,
         timeout: Optional[float] = None,
         deadline: Optional["Deadline"] = None,
         metadata: Optional["MetadataLike"] = None
-    ) -> "CommandResponse":
+    ) -> "SetCommandResultResponse":
         return await self._unary_unary(
-            "/rlbird.RLBirdServer/SendCommandResponse",
-            send_command_response_request,
-            CommandResponse,
+            "/rlbird.RLBirdServer/SetCommandResult",
+            set_command_result_request,
+            SetCommandResultResponse,
             timeout=timeout,
             deadline=deadline,
             metadata=metadata,
@@ -179,9 +184,9 @@ class RlBirdServerBase(ServiceBase):
     ) -> "Command":
         raise grpclib.GRPCError(grpclib.const.Status.UNIMPLEMENTED)
 
-    async def send_command_response(
-        self, send_command_response_request: "SendCommandResponseRequest"
-    ) -> "CommandResponse":
+    async def set_command_result(
+        self, set_command_result_request: "SetCommandResultRequest"
+    ) -> "SetCommandResultResponse":
         raise grpclib.GRPCError(grpclib.const.Status.UNIMPLEMENTED)
 
     async def __rpc_get_next_command(
@@ -191,12 +196,12 @@ class RlBirdServerBase(ServiceBase):
         response = await self.get_next_command(request)
         await stream.send_message(response)
 
-    async def __rpc_send_command_response(
+    async def __rpc_set_command_result(
         self,
-        stream: "grpclib.server.Stream[SendCommandResponseRequest, CommandResponse]",
+        stream: "grpclib.server.Stream[SetCommandResultRequest, SetCommandResultResponse]",
     ) -> None:
         request = await stream.recv_message()
-        response = await self.send_command_response(request)
+        response = await self.set_command_result(request)
         await stream.send_message(response)
 
     def __mapping__(self) -> Dict[str, grpclib.const.Handler]:
@@ -207,10 +212,10 @@ class RlBirdServerBase(ServiceBase):
                 GetNextCommandRequest,
                 Command,
             ),
-            "/rlbird.RLBirdServer/SendCommandResponse": grpclib.const.Handler(
-                self.__rpc_send_command_response,
+            "/rlbird.RLBirdServer/SetCommandResult": grpclib.const.Handler(
+                self.__rpc_set_command_result,
                 grpclib.const.Cardinality.UNARY_UNARY,
-                SendCommandResponseRequest,
-                CommandResponse,
+                SetCommandResultRequest,
+                SetCommandResultResponse,
             ),
         }

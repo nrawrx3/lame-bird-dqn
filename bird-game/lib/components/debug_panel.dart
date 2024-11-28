@@ -29,11 +29,6 @@ class DebugCountPanel extends PositionComponent with HasGameReference<MyGame> {
   void update(double dt) {
     super.update(dt);
 
-    if (game.tapCount == 0) {
-      _textComponent.text = 'Tap to start';
-      return;
-    }
-
     if (game.isPaused) {
       _textComponent.text = 'Paused';
       return;

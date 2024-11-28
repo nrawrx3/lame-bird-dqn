@@ -4,7 +4,7 @@ package rlbird;
 
 service RLBirdServer {
   rpc GetNextCommand(GetNextCommandRequest) returns (Command);
-  rpc SendCommandResponse(SendCommandResponseRequest) returns (CommandResponse);
+  rpc SetCommandResult(SetCommandResultRequest) returns (SetCommandResultResponse);
 }
 
 
@@ -12,8 +12,11 @@ message GetNextCommandRequest {
 // Empty for now.
 }
 
-message SendCommandResponseRequest {
-  CommandResponse action_response = 1;
+message SetCommandResultRequest {
+  CommandResult command_result = 1;
+}
+
+message SetCommandResultResponse {
 }
 
 message Command {
@@ -31,6 +34,7 @@ message Command {
   }
 }
 
+// Ignored. We're hardcoding this in the game side.
 message CreateNewGameCommandData {
   GameWorldBounds game_world_bounds = 1;
   DifficultyParams difficulty_params = 2;
@@ -98,10 +102,8 @@ message Wall {
 }
 
 
-message CommandResponse {
+message CommandResult {
   GameState game_state = 1;
   bool game_over = 2;
   double reward = 3;
-  double penalty = 4;
-  double score = 5;
 }

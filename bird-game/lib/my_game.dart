@@ -4,14 +4,14 @@ import 'package:flame/components.dart';
 import 'package:flame/events.dart';
 import 'package:flame/extensions.dart';
 import 'package:flame/game.dart';
-import 'package:flame_audio/flame_audio.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:lame_hexagon/components/ball.dart';
 import 'package:lame_hexagon/components/debug_panel.dart';
 import 'package:lame_hexagon/components/wall.dart';
 import 'package:lame_hexagon/config.dart' as config;
-import 'package:lame_hexagon/protos/rl_server.pbgrpc.dart';
+import 'package:lame_hexagon/generated/rlbird.pb.dart';
+import 'package:lame_hexagon/rlbird_client.dart';
 import 'package:lame_hexagon/wall_builder.dart';
 import 'package:lame_hexagon/wall_height_generator.dart';
 import 'package:lame_hexagon/wall_queue.dart';
@@ -30,8 +30,15 @@ enum GameMode {
 
 // From the point of view of the RL the game can be in one of the following states:
 enum RLServerControlState {
-  awaitingStepCommand,
-  executingStepCommand,
+  awaitingNextCommand, // Waiting for the GetNextCommand rpc to complete.
+  executingCommand,
+  settingCommandResult, // Waiting for the SetCommandResult rpc to complete.
+}
+
+enum ApplyCommandResult {
+  noop,
+  resetGame,
+  updateGame,
 }
 
 const numSkipFramesPerStepCommand = 10;
@@ -62,9 +69,6 @@ class MyGame extends FlameGame
   var accumulatedTime = 0.0;
   var shouldRotateCamera = false;
 
-  RLServerControlState _rlControlState =
-      RLServerControlState.awaitingStepCommand;
-
   final Random rng;
   int difficultyLevel = 0;
 
@@ -73,13 +77,14 @@ class MyGame extends FlameGame
   bool isPaused =
       false; // TODO: We should ignore this and depend on only the rlControlState.
 
+  RLServerControlState _rlControlState =
+      RLServerControlState.awaitingNextCommand;
+
+  RLBirdClient rlClient;
+
   // ----> Tracked data for a single RL step
 
-  // A step game request is taken and applied to the game and then we update for
-  // skip frames without any input from the RL server. Then we complete the
-  // completer with the current game state.
-  Completer<StepGameResponse>? _pendingStepGameResponse;
-  StepGameRequest? _stepGameRequest;
+  Command? _nextCommand;
   int _remainingSkipFramesForNextStepCommand = numSkipFramesPerStepCommand;
   // The collisions the ball has had with the walls after a step command. We will send it to the RL server as part of StepGameResponse.
   final List<WallCollision> _wallCollisions = [];
@@ -87,7 +92,7 @@ class MyGame extends FlameGame
   // <---- Tracked data for a single RL step
 
   late RectangleComponent backgroundRect;
-  MyGame(int seed, this.difficultyLevel, this.diffParams,
+  MyGame(int seed, this.difficultyLevel, this.diffParams, this.rlClient,
       {this.gameMode = GameMode.playing})
       : ball = Ball(
             v: Vector2(diffParams.ballMaxVelocity, 0),
@@ -134,7 +139,7 @@ class MyGame extends FlameGame
       );
 
       final wallQueue = WallQueue(
-          heightGenerator: heightGenerator, initialEndX: 1000, rng: rng);
+          heightGenerator: heightGenerator, initialEndX: 1000.0, rng: rng);
 
       world.add(wallQueue);
     }
@@ -143,25 +148,29 @@ class MyGame extends FlameGame
 
     camera.viewport.add(DebugCountPanel());
 
-    FlameAudio.audioCache.loadAll(["good_collision.wav", "bad_collision.wav"]);
+    // FlameAudio.audioCache.loadAll(["good_collision.wav", "bad_collision.wav"]);
+
+    _rlControlState = RLServerControlState.awaitingNextCommand;
+
+    // Issue the first GetNextCommand rpc to the RL server.
+    rlClient
+        .getNextCommand(GetNextCommandRequest())
+        .then((response) => startExecutingCommand(response));
   }
 
-  Future<StepGameResponse> processStepCommand(StepGameRequest stepRequest) {
+  void startExecutingCommand(Command command) {
     debugPrint('Received step command from RL server.');
 
     // Do nothing if we're not in awaitingStepCommand state
-    if (_rlControlState != RLServerControlState.awaitingStepCommand) {
+    if (_rlControlState != RLServerControlState.awaitingNextCommand) {
       debugPrint(
           'processStepCommand called when not in awaitingStepCommand state, fix the client please.');
 
-      return Future.value(StepGameResponse());
+      return;
     }
-
-    _pendingStepGameResponse = Completer<StepGameResponse>();
     _remainingSkipFramesForNextStepCommand = numSkipFramesPerStepCommand;
-    _rlControlState = RLServerControlState.executingStepCommand;
-
-    return _pendingStepGameResponse!.future;
+    _rlControlState = RLServerControlState.executingCommand;
+    _nextCommand = command;
   }
 
   void recordWallCollisionEvent(WallComponent wall) {
@@ -185,14 +194,15 @@ class MyGame extends FlameGame
   }
 
   void _resetRLStateAfterSkipFrames() {
+    debugPrint('Resetting RL state after skipping frames.');
+
     _remainingSkipFramesForNextStepCommand = numSkipFramesPerStepCommand;
     _wallCollisions.clear();
-    _pendingStepGameResponse = null;
-    _rlControlState = RLServerControlState.awaitingStepCommand;
+    _rlControlState = RLServerControlState.awaitingNextCommand;
   }
 
   get isAwaitingStepCommand =>
-      _rlControlState == RLServerControlState.awaitingStepCommand;
+      _rlControlState == RLServerControlState.awaitingNextCommand;
 
   // For debugging.
   void panCamera(Direction direction) {
@@ -281,8 +291,6 @@ class MyGame extends FlameGame
     camera.follow(ballX);
 
     resetCount++;
-
-    _rlControlState = RLServerControlState.awaitingStepCommand;
   }
 
   @override
@@ -290,27 +298,87 @@ class MyGame extends FlameGame
     super.update(dt);
 
     switch (_rlControlState) {
-      case RLServerControlState.awaitingStepCommand:
+      case RLServerControlState.awaitingNextCommand:
         break;
 
-      case RLServerControlState.executingStepCommand:
+      case RLServerControlState.settingCommandResult:
+        break;
+
+      case RLServerControlState.executingCommand:
         if (_remainingSkipFramesForNextStepCommand ==
             numSkipFramesPerStepCommand) {
-          // We just received a new step command, apply it to the game.
-          _applyStepCommand(_stepGameRequest!);
-          _stepGameRequest = null;
+          // The current skip frames count is max, means that we have not
+          // yet processed the command. Apply it now.
+
+          final res = _applyCommand(_nextCommand!);
+
+          // If this is a create new game command, we need to reset the game.
+          if (res == ApplyCommandResult.resetGame) {
+            _rlControlState = RLServerControlState.settingCommandResult;
+
+            // TODO: Create the command result from the current game state.
+            final commandResult = CommandResult(
+              gameState: GameState(
+                ballState: BallState(),
+                visibleWallsState: VisibleWallsState(
+                  walls: [],
+                ),
+                wallCollisions: [],
+              ),
+            );
+
+            rlClient
+                .setCommandResult(
+                    SetCommandResultRequest(commandResult: commandResult))
+                .then((response) {
+              _resetRLStateAfterSkipFrames();
+
+              // Ask the server for the next command.
+              debugPrint('Req next command');
+              rlClient.getNextCommand(GetNextCommandRequest()).then((response) {
+                startExecutingCommand(response);
+              });
+            });
+          }
+
+          break; // We have reset the game, nothing else to update.
         }
 
         _remainingSkipFramesForNextStepCommand =
             max(0, _remainingSkipFramesForNextStepCommand - 1);
 
         if (_remainingSkipFramesForNextStepCommand == 0) {
-          // TODO: Complete the completer with the step game response
-
           debugPrint('Processed all frames before awaiting next step command.');
 
-          // Reset the RL state
-          _resetRLStateAfterSkipFrames();
+          // Send the command result to the RL server.
+          // TODO: Create the command result from the current game state.
+          final commandResult = CommandResult(
+            gameState: GameState(
+              ballState: BallState(),
+              visibleWallsState: VisibleWallsState(
+                walls: [],
+              ),
+              wallCollisions: [],
+            ),
+          );
+
+          // Send the command result to the RL server.
+
+          _rlControlState = RLServerControlState.settingCommandResult;
+
+          rlClient
+              .setCommandResult(SetCommandResultRequest(
+            commandResult: commandResult,
+          ))
+              .then((response) {
+            _resetRLStateAfterSkipFrames();
+
+            // Ask the server for the next command.
+            debugPrint('Req next command');
+            rlClient.getNextCommand(GetNextCommandRequest()).then((response) {
+              startExecutingCommand(response);
+            });
+          });
         }
 
         resetLastCollisionToGood?.update(dt);
@@ -319,10 +387,6 @@ class MyGame extends FlameGame
         if (gameMode == GameMode.wallBuilding) {
           ballX.y = ball.position
               .y; // Follow the ball vertically as well in wall building mode.
-        }
-
-        if (tapCount == 0 || isPaused) {
-          return;
         }
 
         accumulatedTime += dt;
@@ -337,12 +401,22 @@ class MyGame extends FlameGame
     }
   }
 
-  void _applyStepCommand(StepGameRequest stepRequest) {
-    // Apply the step command to the game
-    if (stepRequest.shouldJump) {
-      tapCount++;
-      ball.addVelocity(Vector2(0, -diffParams.ballNudgeVelocity));
+  ApplyCommandResult _applyCommand(Command command) {
+    switch (command.commandType) {
+      case Command_CommandType.CREATE_NEW_GAME:
+        resetGame();
+        return ApplyCommandResult.resetGame;
+
+      case Command_CommandType.ACTION_JUMP:
+        tapCount++;
+        ball.addVelocity(Vector2(0, -diffParams.ballNudgeVelocity));
+        return ApplyCommandResult.updateGame;
+
+      case Command_CommandType.NOOP:
+        tapCount++;
+        return ApplyCommandResult.updateGame;
     }
+    return ApplyCommandResult.noop;
   }
 
   void updateBackgroundRectPosition() {

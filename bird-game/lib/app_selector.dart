@@ -2,7 +2,7 @@ import 'package:flame/game.dart';
 import 'package:flutter/material.dart';
 import 'package:lame_hexagon/config.dart';
 import 'package:lame_hexagon/my_game.dart';
-import 'package:lame_hexagon/rl_server.dart';
+import 'package:lame_hexagon/rlbird_client.dart';
 import 'package:provider/provider.dart';
 
 class AppSelector extends StatelessWidget {
@@ -85,11 +85,9 @@ class GameScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final rlServer = Provider.of<RLServer>(context);
-    final myGame = MyGame(
-        0xdeadc0de, _difficultyLevel, DifficultyParams.get(_difficultyLevel));
-
-    rlServer.setGame(myGame);
+    final rlClient = Provider.of<RLBirdClient>(context);
+    final myGame = MyGame(0xdeadc0de, _difficultyLevel,
+        DifficultyParams.get(_difficultyLevel), rlClient);
 
     return Scaffold(
       body: GameWidget(
@@ -106,8 +104,11 @@ class WallGeneratorScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       body: GameWidget(
-          game: MyGame(0xdeadc0de, _difficultyLevel,
+          game: MyGame(
+              0xdeadc0de,
+              _difficultyLevel,
               DifficultyParams.get(_difficultyLevel),
+              Provider.of<RLBirdClient>(context),
               gameMode: GameMode.wallBuilding)),
     );
   }
@@ -120,8 +121,11 @@ class WallVisualizingScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       body: GameWidget(
-          game: MyGame(0xdeadc0de, _difficultyLevel,
+          game: MyGame(
+              0xdeadc0de,
+              _difficultyLevel,
               DifficultyParams.get(_difficultyLevel),
+              Provider.of<RLBirdClient>(context),
               gameMode: GameMode.wallVisualizing)),
     );
   }
