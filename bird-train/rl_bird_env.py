@@ -10,7 +10,7 @@ from rlbird import (
     BallState,
     VisibleWallsState,
 )
-from service import RLBirdService
+from rl_service import RLBirdService
 import asyncio
 from typing import override
 
@@ -40,9 +40,10 @@ def observation_space_from_game_state(game_state: GameState) -> np.array:
     point[4] = bs.ax
     point[5] = bs.ay
 
-    assert len(game_state.visible_walls_state.walls) == NUM_VISIBLE_WALLS
+    # TODO: Uncomment after implementing visible walls in game state
+    # assert len(game_state.visible_walls_state.walls) == NUM_VISIBLE_WALLS
 
-    for i, vws in enumerate(game_state.visible_walls):
+    for i, vws in enumerate(game_state.visible_walls_state.walls):
         point[6 + i * 5] = vws.x
         point[7 + i * 5] = vws.y
         point[8 + i * 5] = vws.width
@@ -73,13 +74,27 @@ class RLBirdEnv(gym.Env):
             command_type=CommandCommandType.CREATE_NEW_GAME,
             create_new_game_command=CreateNewGameCommandData(),
         )
-        self.rl_service.set_next_command(command)
 
-        # Await the result from the game in an asynchronous manner
-        loop = asyncio.get_event_loop()
-        command_result = loop.run_until_complete(self.rl_service.get_command_result())
+        print("Pushing create new game command...")
+        future = asyncio.run_coroutine_threadsafe(
+            self.rl_service.push_next_command(command),
+            # asyncio.get_running_loop(),
+            self.rl_service.loop,
+        )
 
-        print(f'Received result from create new game command: {command_result}')
+        future.result()  # Wait for the command to be queued
+
+        print("Done pushing create new game command.")
+
+        # Wait for the result from the game
+        future = asyncio.run_coroutine_threadsafe(
+            self.rl_service.pop_result(),
+            # asyncio.get_running_loop(),
+            self.rl_service.loop,
+        )
+        command_result = future.result()  # Blocking call
+
+        print(f"Received result from create new game command: {command_result}")
 
         # Process game state and return the observation
         game_state = command_result.game_state
@@ -88,22 +103,32 @@ class RLBirdEnv(gym.Env):
 
     @override
     def step(self, action):
-        print(f'Action: {action}')
+        print(f"Action: {action}")
 
         # Choose the command based on the action
         if action == 1:
             command = Command(
-                command_type=CommandCommandType.JUMP,
+                command_type=CommandCommandType.ACTION_JUMP,
                 action_jump_command=ActionJumpCommandData(jump_force=1.0),
             )
         else:
             command = Command(command_type=CommandCommandType.NOOP)
 
-        self.rl_service.set_next_command(command)
+        # Push the command synchronously
+        future = asyncio.run_coroutine_threadsafe(
+            self.rl_service.push_next_command(command),
+            # asyncio.get_running_loop(),
+            self.rl_service.loop,
+        )
+        future.result()  # Wait for the command to be queued
 
-        # Await the result from the game in an asynchronous manner
-        loop = asyncio.get_event_loop()
-        command_result = loop.run_until_complete(self.rl_service.get_command_result())
+        # Wait for the result from the game
+        future = asyncio.run_coroutine_threadsafe(
+            self.rl_service.pop_result(),
+            # asyncio.get_running_loop(),
+            self.rl_service.loop,
+        )
+        command_result = future.result()  # Blocking call
 
         # Process game state and return results
         game_state = command_result.game_state

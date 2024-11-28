@@ -89,6 +89,10 @@ class MyGame extends FlameGame
   // The collisions the ball has had with the walls after a step command. We will send it to the RL server as part of StepGameResponse.
   final List<WallCollision> _wallCollisions = [];
 
+  int frameNumber = 0;
+  int _commandStartFrame = 0;
+  int _commandEndFrame = 0;
+
   // <---- Tracked data for a single RL step
 
   late RectangleComponent backgroundRect;
@@ -199,6 +203,8 @@ class MyGame extends FlameGame
     _remainingSkipFramesForNextStepCommand = numSkipFramesPerStepCommand;
     _wallCollisions.clear();
     _rlControlState = RLServerControlState.awaitingNextCommand;
+    _commandStartFrame = 0;
+    _commandEndFrame = 0;
   }
 
   get isAwaitingStepCommand =>
@@ -305,10 +311,16 @@ class MyGame extends FlameGame
         break;
 
       case RLServerControlState.executingCommand:
+        frameNumber++;
+
         if (_remainingSkipFramesForNextStepCommand ==
             numSkipFramesPerStepCommand) {
           // The current skip frames count is max, means that we have not
           // yet processed the command. Apply it now.
+
+          _commandEndFrame = frameNumber;
+
+          _commandStartFrame = accumulatedTime.toInt();
 
           final res = _applyCommand(_nextCommand!);
 
@@ -350,6 +362,8 @@ class MyGame extends FlameGame
         if (_remainingSkipFramesForNextStepCommand == 0) {
           debugPrint('Processed all frames before awaiting next step command.');
 
+          _commandEndFrame = frameNumber;
+
           // Send the command result to the RL server.
           // TODO: Create the command result from the current game state.
           final commandResult = CommandResult(
@@ -360,6 +374,8 @@ class MyGame extends FlameGame
               ),
               wallCollisions: [],
             ),
+            startFrame: _commandStartFrame,
+            endFrame: _commandEndFrame,
           );
 
           // Send the command result to the RL server.

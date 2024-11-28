@@ -1080,6 +1080,8 @@ class CommandResult extends $pb.GeneratedMessage {
     GameState? gameState,
     $core.bool? gameOver,
     $core.double? reward,
+    $core.int? startFrame,
+    $core.int? endFrame,
   }) {
     final $result = create();
     if (gameState != null) {
@@ -1091,6 +1093,12 @@ class CommandResult extends $pb.GeneratedMessage {
     if (reward != null) {
       $result.reward = reward;
     }
+    if (startFrame != null) {
+      $result.startFrame = startFrame;
+    }
+    if (endFrame != null) {
+      $result.endFrame = endFrame;
+    }
     return $result;
   }
   CommandResult._() : super();
@@ -1101,6 +1109,8 @@ class CommandResult extends $pb.GeneratedMessage {
     ..aOM<GameState>(1, _omitFieldNames ? '' : 'gameState', subBuilder: GameState.create)
     ..aOB(2, _omitFieldNames ? '' : 'gameOver')
     ..a<$core.double>(3, _omitFieldNames ? '' : 'reward', $pb.PbFieldType.OD)
+    ..a<$core.int>(4, _omitFieldNames ? '' : 'startFrame', $pb.PbFieldType.O3)
+    ..a<$core.int>(5, _omitFieldNames ? '' : 'endFrame', $pb.PbFieldType.O3)
     ..hasRequiredFields = false
   ;
 
@@ -1153,6 +1163,24 @@ class CommandResult extends $pb.GeneratedMessage {
   $core.bool hasReward() => $_has(2);
   @$pb.TagNumber(3)
   void clearReward() => clearField(3);
+
+  @$pb.TagNumber(4)
+  $core.int get startFrame => $_getIZ(3);
+  @$pb.TagNumber(4)
+  set startFrame($core.int v) { $_setSignedInt32(3, v); }
+  @$pb.TagNumber(4)
+  $core.bool hasStartFrame() => $_has(3);
+  @$pb.TagNumber(4)
+  void clearStartFrame() => clearField(4);
+
+  @$pb.TagNumber(5)
+  $core.int get endFrame => $_getIZ(4);
+  @$pb.TagNumber(5)
+  set endFrame($core.int v) { $_setSignedInt32(4, v); }
+  @$pb.TagNumber(5)
+  $core.bool hasEndFrame() => $_has(4);
+  @$pb.TagNumber(5)
+  void clearEndFrame() => clearField(5);
 }
 
 

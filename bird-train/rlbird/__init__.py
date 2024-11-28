@@ -139,6 +139,8 @@ class CommandResult(betterproto.Message):
     game_state: "GameState" = betterproto.message_field(1)
     game_over: bool = betterproto.bool_field(2)
     reward: float = betterproto.double_field(3)
+    start_frame: int = betterproto.int32_field(4)
+    end_frame: int = betterproto.int32_field(5)
 
 
 class RlBirdServerStub(betterproto.ServiceStub):

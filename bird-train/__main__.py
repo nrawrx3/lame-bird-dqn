@@ -1,72 +1,68 @@
-from service import RLBirdService
+import asyncio
+import threading
 from grpclib.server import Server
 from rl_bird_env import RLBirdEnv
-import asyncio, threading
-import nest_asyncio
-import signal
-from sys import exit
-
-nest_asyncio.apply()
+from rl_service import RLBirdService
+from rlbird import Command, CommandCommandType
 
 
-def shutdown_event_loop(loop, rl_service, grpc_thread):
-    print("\nShutting down gracefully...")
-    rl_service.shutdown()  # Custom method to clean up RLBirdService resources if needed
-    loop.stop()
-    print("Shutdown complete.")
-    exit(1)
+def start_grpc_server(loop, rl_service):
+    """
+    Run the gRPC server in a specified event loop.
+    """
+    asyncio.set_event_loop(loop)
+    server = Server([rl_service])
+
+    async def grpc_server():
+        await server.start("127.0.0.1", 50051)
+        print("gRPC server started on port 50051...")
+        await server.wait_closed()
+
+    loop.run_until_complete(grpc_server())
 
 
-async def run_env_loop(rl_service: RLBirdService):
-    env = RLBirdEnv(rl_service)
+def start_env_loop(loop, rl_service):
+    """
+    Run the environment loop in a specified event loop.
+    """
+    asyncio.set_event_loop(loop)
 
-    print("Resetting the environment...")
-    # Reset the environment
-    state, _ = await asyncio.create_task(env.reset())
+    async def env_loop():
+        env = RLBirdEnv(rl_service)
 
-    print('Starting the step loop...')
+        state, _ = env.reset()
+        print(f"Initial state: {state}")
 
-    done = False
-    while not done:
-        action = env.action_space.sample()  # Random action
-        state, reward, done, _ = await asyncio.create_task(env.step(action))
-        print(f"State: {state}, Reward: {reward}, Done: {done}")
+        done = False
+        while not done:
+            action = env.action_space.sample()
+            state, reward, done, info = env.step(action)
 
+            print(f"Action: {action}, State: {state}, Reward: {reward}, Done: {done}")
+            await asyncio.sleep(0.1)
 
-async def run_grpc_server(rl_service: RLBirdService):
-    server = Server([rl_service])  # Use the shared instance
-    await server.start("127.0.0.1", 50051)
-    print("gRPC server started on port 50051...")
-    await server.wait_closed()
+        print("Environment loop finished.")
+
+    loop.run_until_complete(env_loop())
 
 
 if __name__ == "__main__":
-    # Create a shared instance of RLBirdService
-    shared_rl_service = RLBirdService()
+    grpc_loop = asyncio.new_event_loop()
+    env_loop = asyncio.new_event_loop()
 
-    # Function to run the gRPC server
-    def run_grpc_server_thread():
-        asyncio.run(run_grpc_server(shared_rl_service))
+    # Shared service instance
+    rl_service = RLBirdService(grpc_loop)
 
-    # Start the gRPC server in a separate thread
-    grpc_thread = threading.Thread(target=run_grpc_server_thread, daemon=True)
+    # Start threads
+    grpc_thread = threading.Thread(
+        target=start_grpc_server, args=(grpc_loop, rl_service)
+    )
+    env_thread = threading.Thread(target=start_env_loop, args=(env_loop, rl_service))
+
     grpc_thread.start()
+    env_thread.start()
 
-    # Run the environment loop in the main thread
-    try:
-        loop = asyncio.get_event_loop()
+    grpc_thread.join()
+    env_thread.join()
 
-        def signal_handler(sig, frame):
-            shutdown_event_loop(loop, shared_rl_service, grpc_thread)
-
-        # Register signal handler for graceful shutdown
-        signal.signal(signal.SIGINT, signal_handler)
-        signal.signal(signal.SIGTERM, signal_handler)
-
-        # Run the environment loop
-        loop.run_until_complete(run_env_loop(shared_rl_service))
-    except KeyboardInterrupt:
-        shutdown_event_loop(loop, shared_rl_service, grpc_thread)
-    except Exception as e:
-        print(f"An unexpected error occurred: {e}")
-        shutdown_event_loop(loop, shared_rl_service, grpc_thread)
+    print("All threads have completed.")

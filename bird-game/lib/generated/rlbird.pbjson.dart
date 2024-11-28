@@ -242,6 +242,8 @@ const CommandResult$json = {
     {'1': 'game_state', '3': 1, '4': 1, '5': 11, '6': '.rlbird.GameState', '10': 'gameState'},
     {'1': 'game_over', '3': 2, '4': 1, '5': 8, '10': 'gameOver'},
     {'1': 'reward', '3': 3, '4': 1, '5': 1, '10': 'reward'},
+    {'1': 'start_frame', '3': 4, '4': 1, '5': 5, '10': 'startFrame'},
+    {'1': 'end_frame', '3': 5, '4': 1, '5': 5, '10': 'endFrame'},
   ],
 };
 
@@ -249,5 +251,6 @@ const CommandResult$json = {
 final $typed_data.Uint8List commandResultDescriptor = $convert.base64Decode(
     'Cg1Db21tYW5kUmVzdWx0EjAKCmdhbWVfc3RhdGUYASABKAsyES5ybGJpcmQuR2FtZVN0YXRlUg'
     'lnYW1lU3RhdGUSGwoJZ2FtZV9vdmVyGAIgASgIUghnYW1lT3ZlchIWCgZyZXdhcmQYAyABKAFS'
-    'BnJld2FyZA==');
+    'BnJld2FyZBIfCgtzdGFydF9mcmFtZRgEIAEoBVIKc3RhcnRGcmFtZRIbCgllbmRfZnJhbWUYBS'
+    'ABKAVSCGVuZEZyYW1l');
 
