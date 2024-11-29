@@ -30,7 +30,7 @@ assert OBSERVATION_STATE_SIZE == 56  # Just a sanity check
 
 
 def observation_space_from_game_state(game_state: GameState) -> np.array:
-    point = np.zeros(55, dtype=np.float32)
+    point = np.zeros(OBSERVATION_STATE_SIZE, dtype=np.float32)
 
     bs = game_state.ball_state
     point[0] = bs.x
@@ -43,7 +43,10 @@ def observation_space_from_game_state(game_state: GameState) -> np.array:
     # TODO: Uncomment after implementing visible walls in game state
     # assert len(game_state.visible_walls_state.walls) == NUM_VISIBLE_WALLS
 
-    for i, vws in enumerate(game_state.visible_walls_state.walls):
+    # Take at most NUM_VISIBLE_WALLS walls
+    visible_walls = game_state.visible_walls_state.walls[:NUM_VISIBLE_WALLS]
+
+    for i, vws in enumerate(visible_walls):
         point[6 + i * 5] = vws.x
         point[7 + i * 5] = vws.y
         point[8 + i * 5] = vws.width

@@ -40,6 +40,6 @@ class DebugCountPanel extends PositionComponent with HasGameReference<MyGame> {
     }
 
     _textComponent.text =
-        'Collisions: ${game.badCollisionCount} Points: ${game.points}';
+        'Frame: ${game.frameNumber} Collisions: ${game.badCollisionCount} Points: ${game.points}';
   }
 }

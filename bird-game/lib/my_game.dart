@@ -75,7 +75,9 @@ class MyGame extends FlameGame
   GameMode gameMode;
 
   bool isPaused =
-      false; // TODO: We should ignore this and depend on only the rlControlState.
+      false; // TODO: We should ignore this and depend on only the rlControlState.a
+
+  WallQueue? _wallQueue;
 
   RLServerControlState _rlControlState =
       RLServerControlState.awaitingNextCommand;
@@ -112,7 +114,7 @@ class MyGame extends FlameGame
   FutureOr<void> onLoad() async {
     super.onLoad();
 
-    // timeScale = 0.2;
+    // timeScale = 0.5;
 
     // camera.viewport =
     //     FixedResolutionViewport(resolution: Vector2(viewWidth, viewHeight));
@@ -129,10 +131,6 @@ class MyGame extends FlameGame
       ball.setColor(const Color.fromARGB(255, 233, 70, 0));
     }
 
-    // world.add(ball);
-    // world.add(ballX);
-    // camera.follow(ballX);
-
     if (gameMode == GameMode.playing) {
       // world.add(WallRefresherComponent(maxWallsInView: maxWallsInView));
       final heightGenerator = PerlinWallHeightGenerator(
@@ -142,10 +140,10 @@ class MyGame extends FlameGame
         diffParams: diffParams,
       );
 
-      final wallQueue = WallQueue(
+      _wallQueue = WallQueue(
           heightGenerator: heightGenerator, initialEndX: 1000.0, rng: rng);
 
-      world.add(wallQueue);
+      world.add(_wallQueue!);
     }
 
     // debugMode = true;
@@ -163,7 +161,7 @@ class MyGame extends FlameGame
   }
 
   void startExecutingCommand(Command command) {
-    debugPrint('Received step command from RL server.');
+    debugPrint('Received command from RL server: type: ${command.commandType}');
 
     // Do nothing if we're not in awaitingStepCommand state
     if (_rlControlState != RLServerControlState.awaitingNextCommand) {
@@ -318,9 +316,7 @@ class MyGame extends FlameGame
           // The current skip frames count is max, means that we have not
           // yet processed the command. Apply it now.
 
-          _commandEndFrame = frameNumber;
-
-          _commandStartFrame = accumulatedTime.toInt();
+          _commandStartFrame = frameNumber;
 
           final res = _applyCommand(_nextCommand!);
 
@@ -328,16 +324,7 @@ class MyGame extends FlameGame
           if (res == ApplyCommandResult.resetGame) {
             _rlControlState = RLServerControlState.settingCommandResult;
 
-            // TODO: Create the command result from the current game state.
-            final commandResult = CommandResult(
-              gameState: GameState(
-                ballState: BallState(),
-                visibleWallsState: VisibleWallsState(
-                  walls: [],
-                ),
-                wallCollisions: [],
-              ),
-            );
+            final commandResult = _makeCommandResult();
 
             rlClient
                 .setCommandResult(
@@ -351,9 +338,9 @@ class MyGame extends FlameGame
                 startExecutingCommand(response);
               });
             });
-          }
 
-          break; // We have reset the game, nothing else to update.
+            break; // We have reset the game, nothing else to update.
+          }
         }
 
         _remainingSkipFramesForNextStepCommand =
@@ -365,18 +352,7 @@ class MyGame extends FlameGame
           _commandEndFrame = frameNumber;
 
           // Send the command result to the RL server.
-          // TODO: Create the command result from the current game state.
-          final commandResult = CommandResult(
-            gameState: GameState(
-              ballState: BallState(),
-              visibleWallsState: VisibleWallsState(
-                walls: [],
-              ),
-              wallCollisions: [],
-            ),
-            startFrame: _commandStartFrame,
-            endFrame: _commandEndFrame,
-          );
+          final commandResult = _makeCommandResult();
 
           // Send the command result to the RL server.
 
@@ -433,6 +409,34 @@ class MyGame extends FlameGame
         return ApplyCommandResult.updateGame;
     }
     return ApplyCommandResult.noop;
+  }
+
+  CommandResult _makeCommandResult() {
+    return CommandResult(
+      gameState: GameState(
+        ballState: BallState(
+          x: ball.position.x,
+          y: ball.position.y,
+          vx: ball.v.x,
+          vy: ball.v.y,
+          ax: ball.a.x,
+          ay: ball.a.y,
+        ),
+        visibleWallsState: VisibleWallsState(
+            walls: _wallQueue!.visibleWalls.map((w) => Wall(
+                  x: w.position.x,
+                  y: w.position.y,
+                  width: w.width,
+                  height: w.height,
+                  points: w.points.toDouble(),
+                ))),
+        wallCollisions: _wallCollisions,
+      ),
+      startFrame: _commandEndFrame,
+      endFrame: _commandEndFrame,
+    );
+
+    // Take the first 10 visible walls from the wall queue.
   }
 
   void updateBackgroundRectPosition() {
