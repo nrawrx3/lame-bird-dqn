@@ -1,7 +1,8 @@
 import asyncio
 from asyncio import Queue
 from grpclib.server import Server
-from typing import override
+# from typing import override
+from compat import override
 
 from rlbird import (
     RlBirdServerBase,

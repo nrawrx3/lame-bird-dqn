@@ -12,8 +12,8 @@ from rlbird import (
 )
 from rl_service import RLBirdService
 import asyncio
-from typing import override
-
+# from typing import override
+from compat import override
 
 class RLTrainState:
     SAMPLING_ACTION = 0
