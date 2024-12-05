@@ -1,6 +1,6 @@
 import 'package:flame/flame.dart';
 import 'package:flutter/material.dart';
-import 'package:lame_hexagon/app_selector.dart';
+import 'package:lame_hexagon/game_mode_selector.dart';
 import 'package:lame_hexagon/rlbird_client.dart';
 import 'package:provider/provider.dart';
 
@@ -13,6 +13,6 @@ void main() async {
 
   runApp(Provider<RLBirdClient>(
     create: (_) => rlClient,
-    child: const AppSelector(),
+    child: const GameModeSelector(),
   ));
 }

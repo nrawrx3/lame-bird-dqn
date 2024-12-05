@@ -19,6 +19,8 @@ class WallQueue extends Component with HasGameReference<MyGame> {
   double startX;
   double nextStartingX;
 
+  final _initialEndX;
+
   WallQueue(
       {required WallHeightGenerator heightGenerator,
       required Random rng,
@@ -26,11 +28,13 @@ class WallQueue extends Component with HasGameReference<MyGame> {
       initialEndX = 1000.0})
       : _heightGenerator = heightGenerator,
         _rng = rng,
-        nextStartingX = initialEndX;
+        nextStartingX = initialEndX,
+        _initialEndX = initialEndX;
 
-  @override
-  FutureOr<void> onLoad() {
-    super.onLoad();
+  void reset() {
+    visibleWalls.clear();
+    outOfViewWalls.clear();
+    nextStartingX = _initialEndX;
 
     debugPrint('WallQueue loaded, generating initial walls');
 
@@ -52,6 +56,15 @@ class WallQueue extends Component with HasGameReference<MyGame> {
 
     nextStartingX = nextX;
     addLowestNonOverlappingWallsToBackOfQueue();
+  }
+
+  @override
+  FutureOr<void> onLoad() {
+    super.onLoad();
+
+    debugPrint('WallQueue loaded, generating initial walls');
+
+    reset();
   }
 
   @override

@@ -12,7 +12,6 @@ import 'package:lame_hexagon/components/wall.dart';
 import 'package:lame_hexagon/config.dart' as config;
 import 'package:lame_hexagon/generated/rlbird.pb.dart';
 import 'package:lame_hexagon/rlbird_client.dart';
-import 'package:lame_hexagon/wall_builder.dart';
 import 'package:lame_hexagon/wall_height_generator.dart';
 import 'package:lame_hexagon/wall_queue.dart';
 
@@ -23,8 +22,6 @@ enum LastCollisionType {
 
 enum GameMode {
   playing,
-  wallBuilding,
-  wallVisualizing,
   rlTraining,
 }
 
@@ -74,10 +71,13 @@ class MyGame extends FlameGame
 
   GameMode gameMode;
 
-  bool isPaused =
-      false; // TODO: We should ignore this and depend on only the rlControlState.a
+  bool isPaused = false;
 
   WallQueue? _wallQueue;
+
+  double _lastPointAdded = 0;
+
+  Function(GameState)? notifyGameStateChange;
 
   RLServerControlState _rlControlState =
       RLServerControlState.awaitingNextCommand;
@@ -91,16 +91,24 @@ class MyGame extends FlameGame
   // The collisions the ball has had with the walls after a step command. We will send it to the RL server as part of StepGameResponse.
   final List<WallCollision> _wallCollisions = [];
 
+  // The reward sequence for the current step command. This includes both the reward (positive or negative) for each collision and any other rewards to shape the behavior of the agent.
+  final List<double> _rewardSequence = [];
+
   int frameNumber = 0;
   int _commandStartFrame = 0;
   int _commandEndFrame = 0;
 
   // <---- Tracked data for a single RL step
 
-  late RectangleComponent backgroundRect;
-  MyGame(int seed, this.difficultyLevel, this.diffParams, this.rlClient,
-      {this.gameMode = GameMode.playing})
-      : ball = Ball(
+  // late RectangleComponent backgroundRect;
+  MyGame(
+    int seed,
+    this.difficultyLevel,
+    this.diffParams,
+    this.rlClient, {
+    this.gameMode = GameMode.playing,
+    this.notifyGameStateChange,
+  })  : ball = Ball(
             v: Vector2(diffParams.ballMaxVelocity, 0),
             a: Vector2(0, diffParams.g),
             position: Vector2(50, 0),
@@ -108,7 +116,9 @@ class MyGame extends FlameGame
         rng = Random(seed),
         super(
             camera: CameraComponent.withFixedResolution(
-                width: config.viewWidth, height: config.viewHeight));
+                width: config.viewWidth, height: config.viewHeight)) {
+    debugPrint('MyGame constructor called');
+  }
 
   @override
   FutureOr<void> onLoad() async {
@@ -116,23 +126,11 @@ class MyGame extends FlameGame
 
     // timeScale = 0.5;
 
-    // camera.viewport =
-    //     FixedResolutionViewport(resolution: Vector2(viewWidth, viewHeight));
-
     camera.viewfinder.anchor = Anchor.center;
 
     resetGame();
 
-    if (gameMode == GameMode.wallBuilding) {
-      final wallBuilder = WallBuilder();
-      // wallBuilder.priority = -10;
-      add(wallBuilder);
-
-      ball.setColor(const Color.fromARGB(255, 233, 70, 0));
-    }
-
     if (gameMode == GameMode.playing) {
-      // world.add(WallRefresherComponent(maxWallsInView: maxWallsInView));
       final heightGenerator = PerlinWallHeightGenerator(
         rng,
         seed: rng.nextInt(10000),
@@ -150,8 +148,6 @@ class MyGame extends FlameGame
 
     camera.viewport.add(DebugCountPanel());
 
-    // FlameAudio.audioCache.loadAll(["good_collision.wav", "bad_collision.wav"]);
-
     _rlControlState = RLServerControlState.awaitingNextCommand;
 
     // Issue the first GetNextCommand rpc to the RL server.
@@ -161,6 +157,10 @@ class MyGame extends FlameGame
   }
 
   void startExecutingCommand(Command command) {
+    if (config.disableRLClient) {
+      _rlControlState = RLServerControlState.executingCommand;
+    }
+
     debugPrint('Received command from RL server: type: ${command.commandType}');
 
     // Do nothing if we're not in awaitingStepCommand state
@@ -196,10 +196,11 @@ class MyGame extends FlameGame
   }
 
   void _resetRLStateAfterSkipFrames() {
-    debugPrint('Resetting RL state after skipping frames.');
+    // debugPrint('Resetting RL state after skipping frames.');
 
     _remainingSkipFramesForNextStepCommand = numSkipFramesPerStepCommand;
     _wallCollisions.clear();
+    _rewardSequence.clear();
     _rlControlState = RLServerControlState.awaitingNextCommand;
     _commandStartFrame = 0;
     _commandEndFrame = 0;
@@ -207,6 +208,9 @@ class MyGame extends FlameGame
 
   get isAwaitingStepCommand =>
       _rlControlState == RLServerControlState.awaitingNextCommand;
+
+  get isExecutingCommand =>
+      _rlControlState == RLServerControlState.executingCommand;
 
   // For debugging.
   void panCamera(Direction direction) {
@@ -229,25 +233,29 @@ class MyGame extends FlameGame
   @override
   KeyEventResult onKeyEvent(
       KeyEvent event, Set<LogicalKeyboardKey> keysPressed) {
-    // debugPrint('Key pressed: ${event.logicalKey}');
-    if (event is KeyDownEvent || event is KeyRepeatEvent) {
-      if (event.logicalKey == LogicalKeyboardKey.keyA) {
-        panCamera(Direction.left);
-      } else if (event.logicalKey == LogicalKeyboardKey.keyD) {
-        panCamera(Direction.right);
-      } else if (event.logicalKey == LogicalKeyboardKey.keyW) {
-        panCamera(Direction.up);
-      } else if (event.logicalKey == LogicalKeyboardKey.keyS) {
-        panCamera(Direction.down);
-      } else if (event.logicalKey == LogicalKeyboardKey.arrowUp) {
-        camera.viewfinder.zoom += 0.1;
-      } else if (event.logicalKey == LogicalKeyboardKey.arrowDown) {
-        camera.viewfinder.zoom -= 0.1;
-      } else if (event.logicalKey == LogicalKeyboardKey.space) {
-        handleInGameTap();
-      } else if (event.logicalKey == LogicalKeyboardKey.keyP) {
-        isPaused = !isPaused;
+    if (config.disableRLClient) {
+      // debugPrint('Key pressed: ${event.logicalKey}');
+      if (event is KeyDownEvent || event is KeyRepeatEvent) {
+        if (event.logicalKey == LogicalKeyboardKey.keyA) {
+          panCamera(Direction.left);
+        } else if (event.logicalKey == LogicalKeyboardKey.keyD) {
+          panCamera(Direction.right);
+        } else if (event.logicalKey == LogicalKeyboardKey.keyW) {
+          panCamera(Direction.up);
+        } else if (event.logicalKey == LogicalKeyboardKey.keyS) {
+          panCamera(Direction.down);
+        } else if (event.logicalKey == LogicalKeyboardKey.arrowUp) {
+          camera.viewfinder.zoom += 0.1;
+        } else if (event.logicalKey == LogicalKeyboardKey.arrowDown) {
+          camera.viewfinder.zoom -= 0.1;
+        } else if (event.logicalKey == LogicalKeyboardKey.space) {
+          handleInGameTap();
+        }
       }
+    }
+
+    if (event.logicalKey == LogicalKeyboardKey.keyP) {
+      isPaused = !isPaused;
     }
 
     return KeyEventResult.handled;
@@ -277,22 +285,22 @@ class MyGame extends FlameGame
     _resetBallPosition();
 
     if (resetCount > 0) {
-      world.remove(backgroundRect);
+      // world.remove(backgroundRect);
     }
 
-    backgroundRect = RectangleComponent(
-        size: Vector2(config.viewWidth * 2, config.viewHeight * 2),
-        paint: Paint()..color = const Color.fromARGB(100, 253, 242, 242),
-        anchor: Anchor.center);
-
-    backgroundRect.position = ball.position.clone();
-    backgroundRect.position.x += 100;
-
-    world.add(backgroundRect);
+    // backgroundRect = RectangleComponent(
+    //     size: Vector2(config.viewWidth * 2, config.viewHeight * 2),
+    //     paint: Paint()..color = const Color.fromARGB(100, 253, 242, 242),
+    //     anchor: Anchor.center);
+    // backgroundRect.position = ball.position.clone();
+    // backgroundRect.position.x += 100;
+    // world.add(backgroundRect);
 
     world.add(ball);
     world.add(ballX);
     camera.follow(ballX);
+
+    _wallQueue?.reset();
 
     resetCount++;
   }
@@ -300,6 +308,10 @@ class MyGame extends FlameGame
   @override
   void update(double dt) {
     super.update(dt);
+
+    if (isPaused) {
+      return;
+    }
 
     switch (_rlControlState) {
       case RLServerControlState.awaitingNextCommand:
@@ -318,7 +330,7 @@ class MyGame extends FlameGame
 
           _commandStartFrame = frameNumber;
 
-          final res = _applyCommand(_nextCommand!);
+          final res = _applyNextCommand();
 
           // If this is a create new game command, we need to reset the game.
           if (res == ApplyCommandResult.resetGame) {
@@ -347,7 +359,7 @@ class MyGame extends FlameGame
             max(0, _remainingSkipFramesForNextStepCommand - 1);
 
         if (_remainingSkipFramesForNextStepCommand == 0) {
-          debugPrint('Processed all frames before awaiting next step command.');
+          // debugPrint('Processed all frames before awaiting next step command.');
 
           _commandEndFrame = frameNumber;
 
@@ -366,7 +378,7 @@ class MyGame extends FlameGame
             _resetRLStateAfterSkipFrames();
 
             // Ask the server for the next command.
-            debugPrint('Req next command');
+            // debugPrint('Req next command');
             rlClient.getNextCommand(GetNextCommandRequest()).then((response) {
               startExecutingCommand(response);
             });
@@ -376,24 +388,38 @@ class MyGame extends FlameGame
         resetLastCollisionToGood?.update(dt);
 
         ballX.x = ball.position.x + config.viewWidth / 2 * 0.7;
-        if (gameMode == GameMode.wallBuilding) {
-          ballX.y = ball.position
-              .y; // Follow the ball vertically as well in wall building mode.
+
+        // Add penalty if the ball goes out of bounds from the top. But this penalty is only exposed to the RL trainer, not the player. So add it to the reward sequence, not to the game points.
+        if (ball.position.y <= 0) {
+          _rewardSequence.add(-diffParams.outOfTopBoundsPenalty.toDouble());
+          ball.position.y = 0;
+        }
+
+        if (_lastPointAdded >= 0 && config.goodCollisionReward > 0.0) {
+          // Add a small reward if the ball did not collide with any wall in the last frame or collided with a good wall.
+          _rewardSequence.add(config.goodCollisionReward);
         }
 
         accumulatedTime += dt;
+        _lastPointAdded = 0;
 
         // The more the collision, the more the ball velocity upto a max.
-        ball.v.x = min(
-            diffParams.ballStartingVelocity +
-                badCollisionCount * (config.viewWidth / 10),
-            diffParams.ballMaxVelocity);
+        // ball.v.x = min(
+        //     diffParams.ballStartingVelocity +
+        //         badCollisionCount * (config.viewWidth / 10),
+        //     diffParams.ballMaxVelocity);
 
         updateBackgroundRectPosition();
     }
   }
 
-  ApplyCommandResult _applyCommand(Command command) {
+  ApplyCommandResult _applyNextCommand() {
+    if (config.disableRLClient) {
+      return ApplyCommandResult.noop;
+    }
+
+    final command = _nextCommand!;
+
     switch (command.commandType) {
       case Command_CommandType.CREATE_NEW_GAME:
         resetGame();
@@ -412,7 +438,7 @@ class MyGame extends FlameGame
   }
 
   CommandResult _makeCommandResult() {
-    return CommandResult(
+    final res = CommandResult(
       gameState: GameState(
         ballState: BallState(
           x: ball.position.x,
@@ -428,30 +454,38 @@ class MyGame extends FlameGame
                   y: w.position.y,
                   width: w.width,
                   height: w.height,
-                  points: w.points.toDouble(),
+                  points: w.rlReward,
                 ))),
         wallCollisions: _wallCollisions,
       ),
-      startFrame: _commandEndFrame,
+      startFrame: _commandStartFrame,
       endFrame: _commandEndFrame,
+      reward: _rewardSequence.fold(0, (a, b) => a! + b),
     );
 
-    // Take the first 10 visible walls from the wall queue.
+    notifyGameStateChange?.call(res.gameState);
+
+    return res;
   }
 
   void updateBackgroundRectPosition() {
     // Should be around the ball.
-    backgroundRect.position.x = ball.position.x + 100;
-    backgroundRect.position.y = ball.position.y;
+    // backgroundRect.position.x = ball.position.x + 100;
+    // backgroundRect.position.y = ball.position.y;
     // backgroundRect.size = Vector2(viewWidth, viewHeight);
   }
 
   void setBackgroundColor(Color c) {
-    backgroundRect.paint.color = c;
+    // backgroundRect.paint.color = c;
   }
 
-  void addPoints(int pointsToAdd) {
+  void addCollisionPoints(int pointsToAdd) {
     points += pointsToAdd;
+    _lastPointAdded = pointsToAdd.toDouble();
+  }
+
+  void addCollisionReward(double reward) {
+    _rewardSequence.add(reward);
   }
 
   get ballIsPassThrough =>

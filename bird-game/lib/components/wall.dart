@@ -26,19 +26,27 @@ class WallComponent extends RectangleComponent
 
   get isPointGivingWall => points > 0;
 
+  get rlReward {
+    if (points > 0) {
+      return points.toDouble();
+    } else {
+      return game.diffParams.badWallPenalty.toDouble();
+    }
+  }
+
   void setColorBasedOnPoints() {
     switch (points) {
       case 0:
-        paint.color = const Color.fromARGB(255, 20, 20, 20);
+        paint.color = const Color.fromARGB(255, 255, 0, 0);
         break;
       case 1:
         paint.color = const Color.fromARGB(255, 239, 255, 118);
         break;
       case 2:
-        paint.color = const Color.fromARGB(255, 255, 95, 154);
+        paint.color = const Color.fromARGB(255, 95, 255, 175);
         break;
       case 5:
-        paint.color = const Color.fromARGB(255, 255, 0, 0);
+        paint.color = const Color.fromARGB(255, 0, 204, 255);
         break;
       default:
         paint.color = const Color.fromARGB(255, 255, 255, 255);
@@ -79,10 +87,6 @@ class WallComponent extends RectangleComponent
       Set<Vector2> intersectionPoints, PositionComponent other) {
     super.onCollisionStart(intersectionPoints, other);
 
-    if (game.gameMode == GameMode.wallBuilding) {
-      return;
-    }
-
     if (other is! Ball) {
       return;
     }
@@ -109,10 +113,12 @@ class WallComponent extends RectangleComponent
   void handlePointGivingCollision() {
     // FlameAudio.play("good_collision.wav");
 
-    game.addPoints(points);
+    game.addCollisionPoints(points);
+    game.addCollisionReward(rlReward);
+
     game.shouldRotateCamera = false;
     height = 0;
-    game.setBackgroundColor(const Color.fromARGB(150, 206, 253, 235));
+    // game.setBackgroundColor(const Color.fromARGB(150, 206, 253, 235));
     game.lastCollisionType = LastCollisionType.point;
 
     game.recordWallCollisionEvent(this);
@@ -124,7 +130,7 @@ class WallComponent extends RectangleComponent
     // FlameAudio.play("bad_collision.wav");
 
     game.badCollisionCount++;
-    game.addPoints(-game.diffParams.badWallPenalty);
+    game.addCollisionPoints(-game.diffParams.badWallPenalty);
     game.shouldRotateCamera = true;
     game.ball.recreateBrokenPieces();
     game.setBackgroundColor(const Color.fromARGB(149, 255, 167, 167));

@@ -43,7 +43,8 @@ class PerlinWallHeightGenerator implements WallHeightGenerator {
       walls.add(
           Vector4(currentX, diffParams.minWallHeight, wallWidth, wallHeight));
 
-      // currentX += wallWidth + _rng.nextDouble() * 10; // Small gap between walls
+      // Use a constant gap between walls. Commented out the random.
+      // // currentX += wallWidth + _rng.nextDouble() * 10; // Small gap between walls
       currentX += wallWidth + minWallGap;
     }
 

@@ -24,7 +24,7 @@ class Ball extends RectangleComponent
             size: Vector2.all(radius * 2),
             anchor: Anchor.center,
             paint: Paint()
-              ..color = const Color.fromARGB(255, 0, 0, 0)
+              ..color = const Color.fromARGB(255, 255, 0, 0)
               ..style = PaintingStyle.fill,
             children: [CircleHitbox()]);
 

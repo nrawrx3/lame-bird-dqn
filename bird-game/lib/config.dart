@@ -18,6 +18,11 @@ const disableCameraTilt = true;
 
 const maxCameraTilt = 20.0 * pi / 180;
 
+const rlTrainDifficulty = 6;
+const goodCollisionReward = 0.0;
+
+const disableRLClient = false;
+
 class DifficultyParams {
   final double ballMaxVelocity;
   final double ballStartingVelocity;
@@ -29,6 +34,7 @@ class DifficultyParams {
   final double maxWallHeight;
   final double minWallHeight;
   final int badWallPenalty;
+  final int outOfTopBoundsPenalty;
   final double maxWallWidth;
   final double minWallWidth;
   double ballRadius;
@@ -44,6 +50,7 @@ class DifficultyParams {
     required this.maxWallHeight,
     required this.minWallHeight,
     required this.badWallPenalty,
+    required this.outOfTopBoundsPenalty,
     required this.maxWallWidth,
     required this.minWallWidth,
     this.ballRadius = 8.0,
@@ -63,6 +70,7 @@ class DifficultyParams {
           maxWallHeight: viewHeight / 2,
           minWallHeight: 0,
           badWallPenalty: 10,
+          outOfTopBoundsPenalty: 10,
           maxWallWidth: 21.0,
           minWallWidth: 18.0,
         );
@@ -78,6 +86,7 @@ class DifficultyParams {
           maxWallHeight: viewHeight,
           minWallHeight: 0,
           badWallPenalty: 10,
+          outOfTopBoundsPenalty: 10,
           maxWallWidth: 21.0,
           minWallWidth: 18.0,
         );
@@ -93,6 +102,7 @@ class DifficultyParams {
           maxWallHeight: viewHeight * 1.1,
           minWallHeight: 0,
           badWallPenalty: 10,
+          outOfTopBoundsPenalty: 10,
           maxWallWidth: 21.0,
           minWallWidth: 18.0,
         );
@@ -108,7 +118,24 @@ class DifficultyParams {
           maxWallHeight: viewHeight * 0.9,
           minWallHeight: 0,
           badWallPenalty: 10,
+          outOfTopBoundsPenalty: 10,
           maxWallWidth: 100.0,
+          minWallWidth: 100.0,
+        );
+      case rlTrainDifficulty:
+        return DifficultyParams(
+          ballMaxVelocity: viewWidth / 2,
+          ballStartingVelocity: viewWidth / 2,
+          disableCameraTilt: true,
+          ballNudgeVelocity: 400,
+          noiseScale: 0.1,
+          g: 2500,
+          badWallInvisibleProbability: 0.3,
+          maxWallHeight: viewHeight * 0.9,
+          minWallHeight: 0,
+          badWallPenalty: 10,
+          outOfTopBoundsPenalty: 10,
+          maxWallWidth: 100.0, // Keep min and max the same, easier to train.
           minWallWidth: 100.0,
         );
       default:
@@ -123,6 +150,7 @@ class DifficultyParams {
           maxWallHeight: viewHeight * 1,
           minWallHeight: 0,
           badWallPenalty: 10,
+          outOfTopBoundsPenalty: 10,
           maxWallWidth: 21.0,
           minWallWidth: 18.0,
         );
