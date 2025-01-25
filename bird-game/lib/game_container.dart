@@ -1,6 +1,7 @@
 import 'package:flame/game.dart';
 import 'package:flutter/material.dart';
 import 'package:lame_hexagon/config.dart' as config;
+import 'package:lame_hexagon/game_ref_notifier.dart';
 import 'package:lame_hexagon/generated/rlbird.pb.dart';
 import 'package:lame_hexagon/rlbird_client.dart';
 import 'package:provider/provider.dart';
@@ -16,6 +17,9 @@ class GameContainer extends StatelessWidget {
     final gameStateNotifier =
         Provider.of<GameStateNotifier>(context, listen: false);
 
+    final gameRefNotifier =
+        Provider.of<GameRefNotifier>(context, listen: false);
+
     void notifyGameStateChange(GameState gameState) {
       gameStateNotifier.setGameState(gameState);
     }
@@ -27,6 +31,8 @@ class GameContainer extends StatelessWidget {
       rlClient,
       notifyGameStateChange: notifyGameStateChange,
     );
+
+    gameRefNotifier.setGame(myGame);
 
     return SizedBox(
       width: 534,

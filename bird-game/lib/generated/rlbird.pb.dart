@@ -354,6 +354,7 @@ class GameWorldBounds extends $pb.GeneratedMessage {
     $core.double? viewWidth,
     $core.double? viewHeight,
     $core.double? minWallGap,
+    $core.double? maxDistanceToTravel,
   }) {
     final $result = create();
     if (viewWidth != null) {
@@ -365,6 +366,9 @@ class GameWorldBounds extends $pb.GeneratedMessage {
     if (minWallGap != null) {
       $result.minWallGap = minWallGap;
     }
+    if (maxDistanceToTravel != null) {
+      $result.maxDistanceToTravel = maxDistanceToTravel;
+    }
     return $result;
   }
   GameWorldBounds._() : super();
@@ -375,6 +379,7 @@ class GameWorldBounds extends $pb.GeneratedMessage {
     ..a<$core.double>(1, _omitFieldNames ? '' : 'viewWidth', $pb.PbFieldType.OD)
     ..a<$core.double>(2, _omitFieldNames ? '' : 'viewHeight', $pb.PbFieldType.OD)
     ..a<$core.double>(3, _omitFieldNames ? '' : 'minWallGap', $pb.PbFieldType.OD)
+    ..a<$core.double>(4, _omitFieldNames ? '' : 'maxDistanceToTravel', $pb.PbFieldType.OD)
     ..hasRequiredFields = false
   ;
 
@@ -425,6 +430,15 @@ class GameWorldBounds extends $pb.GeneratedMessage {
   $core.bool hasMinWallGap() => $_has(2);
   @$pb.TagNumber(3)
   void clearMinWallGap() => clearField(3);
+
+  @$pb.TagNumber(4)
+  $core.double get maxDistanceToTravel => $_getN(3);
+  @$pb.TagNumber(4)
+  set maxDistanceToTravel($core.double v) { $_setDouble(3, v); }
+  @$pb.TagNumber(4)
+  $core.bool hasMaxDistanceToTravel() => $_has(3);
+  @$pb.TagNumber(4)
+  void clearMaxDistanceToTravel() => clearField(4);
 }
 
 /// The model training does not care about these parameters except the pentalty.
@@ -444,6 +458,7 @@ class DifficultyParams extends $pb.GeneratedMessage {
     $core.double? maxWallWidth,
     $core.double? minWallWidth,
     $core.double? ballRadius,
+    $core.double? maxTravelDistance,
   }) {
     final $result = create();
     if (ballMaxVelocity != null) {
@@ -485,6 +500,9 @@ class DifficultyParams extends $pb.GeneratedMessage {
     if (ballRadius != null) {
       $result.ballRadius = ballRadius;
     }
+    if (maxTravelDistance != null) {
+      $result.maxTravelDistance = maxTravelDistance;
+    }
     return $result;
   }
   DifficultyParams._() : super();
@@ -505,6 +523,7 @@ class DifficultyParams extends $pb.GeneratedMessage {
     ..a<$core.double>(11, _omitFieldNames ? '' : 'maxWallWidth', $pb.PbFieldType.OD)
     ..a<$core.double>(12, _omitFieldNames ? '' : 'minWallWidth', $pb.PbFieldType.OD)
     ..a<$core.double>(13, _omitFieldNames ? '' : 'ballRadius', $pb.PbFieldType.OD)
+    ..a<$core.double>(14, _omitFieldNames ? '' : 'maxTravelDistance', $pb.PbFieldType.OD)
     ..hasRequiredFields = false
   ;
 
@@ -645,6 +664,15 @@ class DifficultyParams extends $pb.GeneratedMessage {
   $core.bool hasBallRadius() => $_has(12);
   @$pb.TagNumber(13)
   void clearBallRadius() => clearField(13);
+
+  @$pb.TagNumber(14)
+  $core.double get maxTravelDistance => $_getN(13);
+  @$pb.TagNumber(14)
+  set maxTravelDistance($core.double v) { $_setDouble(13, v); }
+  @$pb.TagNumber(14)
+  $core.bool hasMaxTravelDistance() => $_has(13);
+  @$pb.TagNumber(14)
+  void clearMaxTravelDistance() => clearField(14);
 }
 
 class GameState extends $pb.GeneratedMessage {
@@ -1082,6 +1110,7 @@ class CommandResult extends $pb.GeneratedMessage {
     $core.double? reward,
     $core.int? startFrame,
     $core.int? endFrame,
+    GameWorldBounds? worldBounds,
   }) {
     final $result = create();
     if (gameState != null) {
@@ -1099,6 +1128,9 @@ class CommandResult extends $pb.GeneratedMessage {
     if (endFrame != null) {
       $result.endFrame = endFrame;
     }
+    if (worldBounds != null) {
+      $result.worldBounds = worldBounds;
+    }
     return $result;
   }
   CommandResult._() : super();
@@ -1111,6 +1143,7 @@ class CommandResult extends $pb.GeneratedMessage {
     ..a<$core.double>(3, _omitFieldNames ? '' : 'reward', $pb.PbFieldType.OD)
     ..a<$core.int>(4, _omitFieldNames ? '' : 'startFrame', $pb.PbFieldType.O3)
     ..a<$core.int>(5, _omitFieldNames ? '' : 'endFrame', $pb.PbFieldType.O3)
+    ..aOM<GameWorldBounds>(6, _omitFieldNames ? '' : 'worldBounds', subBuilder: GameWorldBounds.create)
     ..hasRequiredFields = false
   ;
 
@@ -1181,6 +1214,17 @@ class CommandResult extends $pb.GeneratedMessage {
   $core.bool hasEndFrame() => $_has(4);
   @$pb.TagNumber(5)
   void clearEndFrame() => clearField(5);
+
+  @$pb.TagNumber(6)
+  GameWorldBounds get worldBounds => $_getN(5);
+  @$pb.TagNumber(6)
+  set worldBounds(GameWorldBounds v) { setField(6, v); }
+  @$pb.TagNumber(6)
+  $core.bool hasWorldBounds() => $_has(5);
+  @$pb.TagNumber(6)
+  void clearWorldBounds() => clearField(6);
+  @$pb.TagNumber(6)
+  GameWorldBounds ensureWorldBounds() => $_ensure(5);
 }
 
 

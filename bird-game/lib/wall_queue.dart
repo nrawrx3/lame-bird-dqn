@@ -32,6 +32,15 @@ class WallQueue extends Component with HasGameReference<MyGame> {
         _initialEndX = initialEndX;
 
   void reset() {
+    // Remopve all walls from the component.
+    for (var wall in visibleWalls) {
+      remove(wall);
+    }
+
+    for (var wall in outOfViewWalls) {
+      remove(wall);
+    }
+
     visibleWalls.clear();
     outOfViewWalls.clear();
     nextStartingX = _initialEndX;

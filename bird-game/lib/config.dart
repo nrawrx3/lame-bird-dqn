@@ -37,6 +37,7 @@ class DifficultyParams {
   final int outOfTopBoundsPenalty;
   final double maxWallWidth;
   final double minWallWidth;
+  final double maxTravelDistance; // Before the game ends.
   double ballRadius;
 
   DifficultyParams({
@@ -53,6 +54,7 @@ class DifficultyParams {
     required this.outOfTopBoundsPenalty,
     required this.maxWallWidth,
     required this.minWallWidth,
+    this.maxTravelDistance = viewWidth * 10,
     this.ballRadius = 8.0,
   });
 
@@ -133,10 +135,39 @@ class DifficultyParams {
           badWallInvisibleProbability: 0.3,
           maxWallHeight: viewHeight * 0.9,
           minWallHeight: 0,
-          badWallPenalty: 10,
+          badWallPenalty: 2,
           outOfTopBoundsPenalty: 10,
           maxWallWidth: 100.0, // Keep min and max the same, easier to train.
           minWallWidth: 100.0,
+
+          // ballMaxVelocity: viewWidth / 2,
+          // ballStartingVelocity: viewWidth / 2,
+          // disableCameraTilt: true,
+          // ballNudgeVelocity: 300,
+          // noiseScale: 0.8,
+          // g: 1000,
+          // badWallInvisibleProbability: 0.9,
+          // maxWallHeight: viewHeight * 0.3,
+          // minWallHeight: 0,
+          // badWallPenalty: 100,
+          // outOfTopBoundsPenalty: 100,
+          // maxWallWidth: 21.0,
+          // minWallWidth: 18.0,
+
+          // ballMaxVelocity: viewWidth,
+          // ballStartingVelocity: viewWidth / 2 * 1.5,
+          // disableCameraTilt: true,
+          // ballNudgeVelocity: 250,
+          // noiseScale: 0.35,
+          // g: 1500,
+          // badWallInvisibleProbability: 0.5,
+          // maxWallHeight: viewHeight * 1.1,
+          // minWallHeight: 0,
+          // badWallPenalty: 10,
+          // outOfTopBoundsPenalty: 10,
+          // maxWallWidth: 21.0,
+          // minWallWidth: 18.0,
+          maxTravelDistance: viewWidth * 10,
         );
       default:
         return DifficultyParams(
@@ -153,6 +184,7 @@ class DifficultyParams {
           outOfTopBoundsPenalty: 10,
           maxWallWidth: 21.0,
           minWallWidth: 18.0,
+          maxTravelDistance: viewWidth * 50,
         );
     }
   }

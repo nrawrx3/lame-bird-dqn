@@ -13,9 +13,10 @@ class DebugCountPanel extends PositionComponent with HasGameReference<MyGame> {
       text: 'Collisions: 0, Points: 0',
       textRenderer: TextPaint(
         style: const TextStyle(
-          color: Color.fromARGB(255, 210, 13, 78),
-          fontSize: 20.0,
+          color: Color.fromARGB(255, 0, 242, 255),
+          fontSize: 15.0,
           fontWeight: FontWeight.bold,
+          fontFamily: 'Gopher Mono',
         ),
       ),
     );
@@ -29,8 +30,9 @@ class DebugCountPanel extends PositionComponent with HasGameReference<MyGame> {
   void update(double dt) {
     super.update(dt);
 
-    if (game.isPaused) {
-      _textComponent.text = 'Paused';
+    if (game.isGameOver) {
+      _textComponent.text = 'Game Over';
+      // TODO: Show stats.
       return;
     }
 
@@ -41,5 +43,9 @@ class DebugCountPanel extends PositionComponent with HasGameReference<MyGame> {
 
     _textComponent.text =
         'Frame: ${game.frameNumber} Collisions: ${game.badCollisionCount} Points: ${game.points}';
+
+    if (game.isPaused) {
+      _textComponent.text += ' (Paused)';
+    }
   }
 }

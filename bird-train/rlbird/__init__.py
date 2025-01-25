@@ -72,6 +72,7 @@ class GameWorldBounds(betterproto.Message):
     view_width: float = betterproto.double_field(1)
     view_height: float = betterproto.double_field(2)
     min_wall_gap: float = betterproto.double_field(3)
+    max_distance_to_travel: float = betterproto.double_field(4)
 
 
 @dataclass(eq=False, repr=False)
@@ -94,6 +95,7 @@ class DifficultyParams(betterproto.Message):
     max_wall_width: float = betterproto.double_field(11)
     min_wall_width: float = betterproto.double_field(12)
     ball_radius: float = betterproto.double_field(13)
+    max_travel_distance: float = betterproto.double_field(14)
 
 
 @dataclass(eq=False, repr=False)
@@ -141,6 +143,7 @@ class CommandResult(betterproto.Message):
     reward: float = betterproto.double_field(3)
     start_frame: int = betterproto.int32_field(4)
     end_frame: int = betterproto.int32_field(5)
+    world_bounds: "GameWorldBounds" = betterproto.message_field(6)
 
 
 class RlBirdServerStub(betterproto.ServiceStub):

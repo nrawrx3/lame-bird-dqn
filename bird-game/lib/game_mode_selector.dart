@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:lame_hexagon/config.dart' as config;
 import 'package:lame_hexagon/debug_sidebar.dart';
 import 'package:lame_hexagon/game_container.dart';
+import 'package:lame_hexagon/game_ref_notifier.dart';
 import 'package:lame_hexagon/game_state_notifier.dart';
 import 'package:lame_hexagon/my_game.dart';
 import 'package:lame_hexagon/rlbird_client.dart';
@@ -57,9 +58,9 @@ class MenuScreen extends StatelessWidget {
                 ),
                 onPressed: () {
                   Navigator.of(context).push(MaterialPageRoute(
-                      builder: (context) => const GameScreenRL()));
+                      builder: (context) => const GameScreenTraining()));
                 },
-                child: const Text('Start Game (RL config)')),
+                child: const Text('Start Game (Training)')),
           ),
           // Padding(
           //   padding: const EdgeInsets.all(8.0),
@@ -115,19 +116,22 @@ class GameScreen extends StatelessWidget {
 }
 
 // Parents a MyGame and a DebugSideBar. Provides GameStateNotifier to the subtree.
-class GameScreenRL extends StatelessWidget {
-  const GameScreenRL({super.key});
+class GameScreenTraining extends StatelessWidget {
+  const GameScreenTraining({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: ChangeNotifierProvider<GameStateNotifier>(
         create: (context) => GameStateNotifier(),
-        child: const Row(
-          children: [
-            GameContainer(),
-            DebugSidebar(),
-          ],
+        child: ChangeNotifierProvider<GameRefNotifier>(
+          create: (context) => GameRefNotifier(),
+          child: const Row(
+            children: [
+              GameContainer(),
+              DebugSidebar(),
+            ],
+          ),
         ),
       ),
     );

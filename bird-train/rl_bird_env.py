@@ -9,6 +9,7 @@ from rlbird import (
     GameState,
     BallState,
     VisibleWallsState,
+    GameWorldBounds,
 )
 from rl_service import RLBirdService
 import asyncio
@@ -23,22 +24,24 @@ class RLTrainState:
 
 NUM_BALL_STATE = 6
 NUM_WALL_STATE = 5
-NUM_VISIBLE_WALLS = 10
+NUM_VISIBLE_WALLS = 20
 OBSERVATION_STATE_SIZE = NUM_BALL_STATE + NUM_WALL_STATE * NUM_VISIBLE_WALLS
 
-assert OBSERVATION_STATE_SIZE == 56  # Just a sanity check
+assert OBSERVATION_STATE_SIZE == 106  # Just a sanity check
 
 
-def observation_space_from_game_state(game_state: GameState) -> np.array:
+def observation_space_from_game_state(game_state: GameState, bounds: GameWorldBounds) -> np.array:
     point = np.zeros(OBSERVATION_STATE_SIZE, dtype=np.float32)
 
+    # TODO: Normalize the observation space values. We already know the limits of the velocity. We can also normalize the position if we allow for max 10 seconds of gameplay.
+
     bs = game_state.ball_state
-    point[0] = bs.x
-    point[1] = bs.y
-    point[2] = bs.vx
-    point[3] = bs.vy
-    point[4] = bs.ax
-    point[5] = bs.ay
+    point[0] = bs.x / bounds.max_distance_to_travel
+    point[1] = bs.y / bounds.view_height
+    point[2] = bs.vx / bounds.max_distance_to_travel
+    point[3] = bs.vy / bounds.view_height
+    point[4] = bs.ax / bounds.max_distance_to_travel
+    point[5] = bs.ay / bounds.view_height
 
     # TODO: Uncomment after implementing visible walls in game state
     # assert len(game_state.visible_walls_state.walls) == NUM_VISIBLE_WALLS
@@ -47,10 +50,10 @@ def observation_space_from_game_state(game_state: GameState) -> np.array:
     visible_walls = game_state.visible_walls_state.walls[:NUM_VISIBLE_WALLS]
 
     for i, vws in enumerate(visible_walls):
-        point[6 + i * 5] = vws.x
-        point[7 + i * 5] = vws.y
-        point[8 + i * 5] = vws.width
-        point[9 + i * 5] = vws.height
+        point[6 + i * 5] = vws.x / bounds.max_distance_to_travel
+        point[7 + i * 5] = vws.y / bounds.view_height
+        point[8 + i * 5] = vws.width / bounds.max_distance_to_travel
+        point[9 + i * 5] = vws.height / bounds.view_height
         point[10 + i * 5] = vws.points
 
     return point
@@ -58,8 +61,6 @@ def observation_space_from_game_state(game_state: GameState) -> np.array:
 
 class RLBirdEnv(gym.Env):
     metadata = {"render.modes": ["human"]}
-
-    game_command_queue = []
 
     def __init__(self, rl_service: RLBirdService):
         super(RLBirdEnv, self).__init__()
@@ -69,9 +70,14 @@ class RLBirdEnv(gym.Env):
             low=-np.inf, high=np.inf, shape=(OBSERVATION_STATE_SIZE,), dtype=np.float32
         )
         self.state = RLTrainState.WAITING_FOR_RESET_RESPONSE
+        self.world_bounds = GameWorldBounds()
 
     @override
-    def reset(self):
+    def reset(self, **kwargs):
+        super().reset(**kwargs)
+
+        print("RESETTING GAME")
+
         # Create the command to reset the game
         command = Command(
             command_type=CommandCommandType.CREATE_NEW_GAME,
@@ -97,16 +103,21 @@ class RLBirdEnv(gym.Env):
         )
         command_result = future.result()  # Blocking call
 
+        self.world_bounds = command_result.world_bounds
+
+        print(f'World bounds: {self.world_bounds}')
+
+
         print(f"Received result from create new game command: {command_result}")
 
         # Process game state and return the observation
         game_state = command_result.game_state
-        obs_point = observation_space_from_game_state(game_state)
+        obs_point = observation_space_from_game_state(game_state, self.world_bounds)
         return obs_point, {}
 
     @override
     def step(self, action):
-        print(f"Action: {action}")
+        # print(f"Action: {action}")
 
         # Choose the command based on the action
         if action == 1:
@@ -135,7 +146,7 @@ class RLBirdEnv(gym.Env):
 
         # Process game state and return results
         game_state = command_result.game_state
-        obs_point = observation_space_from_game_state(game_state)
+        obs_point = observation_space_from_game_state(game_state, self.world_bounds)
         reward = command_result.reward
         done = command_result.game_over
-        return obs_point, reward, done, {}
+        return obs_point, reward, done, False, {}

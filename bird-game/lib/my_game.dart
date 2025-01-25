@@ -72,6 +72,7 @@ class MyGame extends FlameGame
   GameMode gameMode;
 
   bool isPaused = false;
+  bool isGameOver = false;
 
   WallQueue? _wallQueue;
 
@@ -124,11 +125,13 @@ class MyGame extends FlameGame
   FutureOr<void> onLoad() async {
     super.onLoad();
 
+    // debugMode = true;
+
     // timeScale = 0.5;
 
     camera.viewfinder.anchor = Anchor.center;
 
-    resetGame();
+    resetGame(isCreateNewGameCommand: false);
 
     if (gameMode == GameMode.playing) {
       final heightGenerator = PerlinWallHeightGenerator(
@@ -143,8 +146,6 @@ class MyGame extends FlameGame
 
       world.add(_wallQueue!);
     }
-
-    // debugMode = true;
 
     camera.viewport.add(DebugCountPanel());
 
@@ -281,7 +282,7 @@ class MyGame extends FlameGame
     ballX.position = ball.position.clone();
   }
 
-  void resetGame() {
+  void resetGame({required bool isCreateNewGameCommand}) {
     _resetBallPosition();
 
     if (resetCount > 0) {
@@ -296,13 +297,21 @@ class MyGame extends FlameGame
     // backgroundRect.position.x += 100;
     // world.add(backgroundRect);
 
-    world.add(ball);
-    world.add(ballX);
-    camera.follow(ballX);
+    if (isCreateNewGameCommand) {
+      isGameOver = false;
+    }
 
-    _wallQueue?.reset();
+    if (!isGameOver) {
+      world.add(ball);
+      world.add(ballX);
+      camera.follow(ballX);
 
-    resetCount++;
+      _wallQueue?.reset();
+
+      points = 0;
+
+      resetCount++;
+    }
   }
 
   @override
@@ -311,6 +320,14 @@ class MyGame extends FlameGame
 
     if (isPaused) {
       return;
+    }
+
+    step(dt);
+  }
+
+  void step(double dt) {
+    if (isGameOver) {
+      _showGameOverScreen();
     }
 
     switch (_rlControlState) {
@@ -336,7 +353,8 @@ class MyGame extends FlameGame
           if (res == ApplyCommandResult.resetGame) {
             _rlControlState = RLServerControlState.settingCommandResult;
 
-            final commandResult = _makeCommandResult();
+            final commandResult =
+                _makeCommandResult(isCreateNewGameCommand: true);
 
             rlClient
                 .setCommandResult(
@@ -410,6 +428,10 @@ class MyGame extends FlameGame
         //     diffParams.ballMaxVelocity);
 
         updateBackgroundRectPosition();
+
+        if (ball.position.x >= diffParams.maxTravelDistance) {
+          isGameOver = true;
+        }
     }
   }
 
@@ -422,7 +444,7 @@ class MyGame extends FlameGame
 
     switch (command.commandType) {
       case Command_CommandType.CREATE_NEW_GAME:
-        resetGame();
+        resetGame(isCreateNewGameCommand: true);
         return ApplyCommandResult.resetGame;
 
       case Command_CommandType.ACTION_JUMP:
@@ -437,7 +459,7 @@ class MyGame extends FlameGame
     return ApplyCommandResult.noop;
   }
 
-  CommandResult _makeCommandResult() {
+  CommandResult _makeCommandResult({bool isCreateNewGameCommand = false}) {
     final res = CommandResult(
       gameState: GameState(
         ballState: BallState(
@@ -463,6 +485,21 @@ class MyGame extends FlameGame
       reward: _rewardSequence.fold(0, (a, b) => a! + b),
     );
 
+    if (isCreateNewGameCommand) {
+      debugPrint("Adding world bounds to the command result.");
+      // Send the world_bounds field.
+      res.worldBounds = GameWorldBounds(
+        viewWidth: config.viewWidth,
+        viewHeight: config.viewHeight,
+        minWallGap: config.minWallGap,
+        maxDistanceToTravel: diffParams.maxTravelDistance,
+      );
+    }
+
+    if (isGameOver) {
+      res.gameOver = true;
+    }
+
     notifyGameStateChange?.call(res.gameState);
 
     return res;
@@ -487,6 +524,14 @@ class MyGame extends FlameGame
   void addCollisionReward(double reward) {
     _rewardSequence.add(reward);
   }
+
+  get cumulativeRLReward => _rewardSequence.fold(0.0, (a, b) => a + b);
+
+  void togglePause() {
+    isPaused = !isPaused;
+  }
+
+  void _showGameOverScreen() {}
 
   get ballIsPassThrough =>
       !config.disableBallPassThrough &&

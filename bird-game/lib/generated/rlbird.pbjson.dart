@@ -112,6 +112,7 @@ const GameWorldBounds$json = {
     {'1': 'view_width', '3': 1, '4': 1, '5': 1, '10': 'viewWidth'},
     {'1': 'view_height', '3': 2, '4': 1, '5': 1, '10': 'viewHeight'},
     {'1': 'min_wall_gap', '3': 3, '4': 1, '5': 1, '10': 'minWallGap'},
+    {'1': 'max_distance_to_travel', '3': 4, '4': 1, '5': 1, '10': 'maxDistanceToTravel'},
   ],
 };
 
@@ -119,7 +120,8 @@ const GameWorldBounds$json = {
 final $typed_data.Uint8List gameWorldBoundsDescriptor = $convert.base64Decode(
     'Cg9HYW1lV29ybGRCb3VuZHMSHQoKdmlld193aWR0aBgBIAEoAVIJdmlld1dpZHRoEh8KC3ZpZX'
     'dfaGVpZ2h0GAIgASgBUgp2aWV3SGVpZ2h0EiAKDG1pbl93YWxsX2dhcBgDIAEoAVIKbWluV2Fs'
-    'bEdhcA==');
+    'bEdhcBIzChZtYXhfZGlzdGFuY2VfdG9fdHJhdmVsGAQgASgBUhNtYXhEaXN0YW5jZVRvVHJhdm'
+    'Vs');
 
 @$core.Deprecated('Use difficultyParamsDescriptor instead')
 const DifficultyParams$json = {
@@ -138,6 +140,7 @@ const DifficultyParams$json = {
     {'1': 'max_wall_width', '3': 11, '4': 1, '5': 1, '10': 'maxWallWidth'},
     {'1': 'min_wall_width', '3': 12, '4': 1, '5': 1, '10': 'minWallWidth'},
     {'1': 'ball_radius', '3': 13, '4': 1, '5': 1, '10': 'ballRadius'},
+    {'1': 'max_travel_distance', '3': 14, '4': 1, '5': 1, '10': 'maxTravelDistance'},
   ],
 };
 
@@ -153,7 +156,7 @@ final $typed_data.Uint8List difficultyParamsDescriptor = $convert.base64Decode(
     'kgASgBUg1taW5XYWxsSGVpZ2h0EigKEGJhZF93YWxsX3BlbmFsdHkYCiABKAVSDmJhZFdhbGxQ'
     'ZW5hbHR5EiQKDm1heF93YWxsX3dpZHRoGAsgASgBUgxtYXhXYWxsV2lkdGgSJAoObWluX3dhbG'
     'xfd2lkdGgYDCABKAFSDG1pbldhbGxXaWR0aBIfCgtiYWxsX3JhZGl1cxgNIAEoAVIKYmFsbFJh'
-    'ZGl1cw==');
+    'ZGl1cxIuChNtYXhfdHJhdmVsX2Rpc3RhbmNlGA4gASgBUhFtYXhUcmF2ZWxEaXN0YW5jZQ==');
 
 @$core.Deprecated('Use gameStateDescriptor instead')
 const GameState$json = {
@@ -244,6 +247,7 @@ const CommandResult$json = {
     {'1': 'reward', '3': 3, '4': 1, '5': 1, '10': 'reward'},
     {'1': 'start_frame', '3': 4, '4': 1, '5': 5, '10': 'startFrame'},
     {'1': 'end_frame', '3': 5, '4': 1, '5': 5, '10': 'endFrame'},
+    {'1': 'world_bounds', '3': 6, '4': 1, '5': 11, '6': '.rlbird.GameWorldBounds', '10': 'worldBounds'},
   ],
 };
 
@@ -252,5 +256,6 @@ final $typed_data.Uint8List commandResultDescriptor = $convert.base64Decode(
     'Cg1Db21tYW5kUmVzdWx0EjAKCmdhbWVfc3RhdGUYASABKAsyES5ybGJpcmQuR2FtZVN0YXRlUg'
     'lnYW1lU3RhdGUSGwoJZ2FtZV9vdmVyGAIgASgIUghnYW1lT3ZlchIWCgZyZXdhcmQYAyABKAFS'
     'BnJld2FyZBIfCgtzdGFydF9mcmFtZRgEIAEoBVIKc3RhcnRGcmFtZRIbCgllbmRfZnJhbWUYBS'
-    'ABKAVSCGVuZEZyYW1l');
+    'ABKAVSCGVuZEZyYW1lEjoKDHdvcmxkX2JvdW5kcxgGIAEoCzIXLnJsYmlyZC5HYW1lV29ybGRC'
+    'b3VuZHNSC3dvcmxkQm91bmRz');
 
